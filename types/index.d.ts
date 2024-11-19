@@ -2,7 +2,7 @@
 
 declare type SearchParamProps = {
   params: { [key: string]: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[]};
 };
 
 // ========================================
@@ -33,7 +33,6 @@ declare type User = {
   dwollaCustomerId: string;
   firstName: string;
   lastName: string;
-  name: string;
   address1: string;
   city: string;
   state: string;
@@ -60,7 +59,7 @@ declare type Account = {
   type: string;
   subtype: string;
   appwriteItemId: string;
-  sharableId: string;
+  shareableId: string;
 };
 
 declare type Transaction = {
@@ -82,14 +81,15 @@ declare type Transaction = {
   receiverBankId: string;
 };
 
-declare type Bank = {
+// declare interface Bank extends Models.Document {
+  declare interface Bank {
   $id: string;
   accountId: string;
   bankId: string;
   accessToken: string;
   fundingSourceUrl: string;
   userId: string;
-  sharableId: string;
+  shareableId: string;
 };
 
 declare type AccountTypes =
@@ -157,7 +157,7 @@ declare interface HeaderBoxProps {
 }
 
 declare interface MobileNavProps {
-  user?: User | null;
+  user: User;
 }
 
 declare interface PageHeaderProps {
@@ -179,14 +179,14 @@ declare interface PlaidLinkProps {
   dwollaCustomerId?: string;
 }
 
-// declare type User = sdk.Models.Document & {
-//   accountId: string;
-//   email: string;
-//   name: string;
-//   items: string[];
-//   accessToken: string;
-//   image: string;
-// };
+declare type User = sdk.Models.Document & {
+  accountId: string;
+  email: string;
+  name: string;
+  items: string[];
+  accessToken: string;
+  image: string;
+};
 
 declare interface AuthFormProps {
   type: "sign-in" | "sign-up";
@@ -203,7 +203,7 @@ declare interface BankTabItemProps {
   appwriteItemId?: string;
 }
 
-declare interface TotlaBalanceBoxProps {
+declare interface TotalBalanceBoxProps {
   accounts: Account[];
   totalBanks: number;
   totalCurrentBalance: number;
