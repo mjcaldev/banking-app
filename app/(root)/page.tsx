@@ -16,6 +16,7 @@ const accountsData = accounts?.data;
 const appwriteItemId = (id as string) || accountsData[0]?.appwriteItemId;
 
 const account = await getAccount({ appwriteItemId })
+console.log({account})
   return (
     <section className="home">
       <div className="home-content">
@@ -40,7 +41,7 @@ const account = await getAccount({ appwriteItemId })
       
       {loggedIn ? (
   <RightSidebar 
-    User={loggedIn}
+    user={loggedIn}
     transactions={[]}
     banks={[{currentBalance: 123.50}, {currentBalance: 125.50}]}
   />

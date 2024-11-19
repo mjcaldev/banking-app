@@ -14,7 +14,21 @@ const {
   APPWRITE_BANK_COLLECTION_ID: BANK_COLLECTION_ID,
 } = process.env
 
+export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+  try {
+    const { database } = await createAdminClient();
 
+    const user = await database.listDocuments(
+      DATABASE_ID!,
+      USER_COLLECTION_ID!,
+      [Query.equal('userId', [userId])]
+    )
+
+    return parseStringify(user.documents[0]);
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const signIn = async ({ email, password }: signInProps) => {
   try {
@@ -67,7 +81,7 @@ export const signUp = async ({ password, ...userData}: SignUpParams) => {
 
       const session = await account.createEmailPasswordSession(email, password);
 
-      cookies().set("appwrite-session", session.secret, {
+      (await cookies()).set("appwrite-session", session.secret, { //added an await here to resolve
         path: "/",
         httpOnly: true,
         sameSite: "strict",
@@ -85,7 +99,9 @@ export const signUp = async ({ password, ...userData}: SignUpParams) => {
 export default async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient();
-    const user = await account.get();
+    const result = await account.get();
+
+    const user = await getUserInfo({ userId: result.$id})
 
     return parseStringify(user)
   } catch (error) {
@@ -97,7 +113,7 @@ export const logoutAccount = async () => {
   try {
     const { account } = await createSessionClient();
 
-    cookies().delete('appwrite-session');
+    (await cookies()).delete('appwrite-session'); //added await here to resolve the error
 
     await account.deleteSession('current');
   } catch (error) {
@@ -230,11 +246,11 @@ export const getBanks = async ({ userId }: getBanksProps) => {
   }
 }
 
-export const getBank = async ({ documentId }: getBanksProps) => {
+export const getBank = async ({ documentId }: getBankProps): Promise<Bank |undefined> => {
   try {
     const { database } = await createAdminClient();
 
-    const bank = await database.listDocuments(
+    const bank = await database.listDocuments<Bank>(
       DATABASE_ID!,
       BANK_COLLECTION_ID!,
       [Query.equal('$id', [documentId])] // the same as the above function but targeting documentId instead of userId and using getBank(no 'S')props.

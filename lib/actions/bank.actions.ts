@@ -20,7 +20,7 @@ export const getAccounts = async ({ userId }: getAccountsProps) => {
   try {
     // get banks from db
     const banks = await getBanks({ userId });
-
+    if (!banks) return;
     const accounts = await Promise.all(
       banks?.map(async (bank: Bank) => {
         // get each account info from plaid
@@ -69,7 +69,8 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
   try {
     // get bank from db
     const bank = await getBank({ documentId: appwriteItemId });
-
+    // console.log(bank);
+    if (!bank) return;
     // get account info from plaid
     const accountsResponse = await plaidClient.accountsGet({
       access_token: bank.accessToken,
@@ -93,10 +94,10 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
     // // //   })
     // // // );
 
-    // // // get institution info from plaid
-    // // const institution = await getInstitution({
-    // //   institutionId: accountsResponse.data.item.institution_id!,
-    // // });
+    // get institution info from plaid
+    const institution = await getInstitution({
+      institutionId: accountsResponse.data.item.institution_id!,
+    });
 
     // // const transactions = await getTransactions({
     //   accessToken: bank?.accessToken,
@@ -106,7 +107,7 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
       id: accountData.account_id,
       availableBalance: accountData.balances.available!,
       currentBalance: accountData.balances.current!,
-      institutionId: institution.institution_id,
+      institutionId: institution?.institution_id,
       name: accountData.name,
       officialName: accountData.official_name,
       mask: accountData.mask!,

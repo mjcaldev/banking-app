@@ -33,7 +33,6 @@ declare type User = {
   dwollaCustomerId: string;
   firstName: string;
   lastName: string;
-  name: string;
   address1: string;
   city: string;
   state: string;
@@ -82,7 +81,8 @@ declare type Transaction = {
   receiverBankId: string;
 };
 
-declare type Bank = {
+// declare interface Bank extends Models.Document {
+  declare interface Bank {
   $id: string;
   accountId: string;
   bankId: string;
@@ -179,14 +179,14 @@ declare interface PlaidLinkProps {
   dwollaCustomerId?: string;
 }
 
-// declare type User = sdk.Models.Document & {
-//   accountId: string;
-//   email: string;
-//   name: string;
-//   items: string[];
-//   accessToken: string;
-//   image: string;
-// };
+declare type User = sdk.Models.Document & {
+  accountId: string;
+  email: string;
+  name: string;
+  items: string[];
+  accessToken: string;
+  image: string;
+};
 
 declare interface AuthFormProps {
   type: "sign-in" | "sign-up";
