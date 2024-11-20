@@ -7,7 +7,7 @@ import { getAccount, getAccounts } from '@/lib/actions/bank.actions';
 const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
   const loggedIn = await getLoggedInUser() //(await getLoggedInUser()) as User | null; to ensure User
   const accounts = await getAccounts({ 
-    userId: loggedIn!.$id
+    userId: loggedIn.$id
     })
 
   if(!accounts) return;
@@ -16,7 +16,10 @@ const accountsData = accounts?.data;
 const appwriteItemId = (id as string) || accountsData[0]?.appwriteItemId;
 
 const account = await getAccount({ appwriteItemId })
-console.log({account})
+console.log({
+  accountsData,
+  account
+})
   return (
     <section className="home">
       <div className="home-content">
@@ -42,8 +45,8 @@ console.log({account})
       {loggedIn ? (
   <RightSidebar 
     user={loggedIn}
-    transactions={[]}
-    banks={[{currentBalance: 123.50}, {currentBalance: 125.50}]}
+    transactions={accounts?.transactions}
+    banks={accountsData?.slice(0, 2)}
   />
 ) : (
   <p>Loading user information...</p>
