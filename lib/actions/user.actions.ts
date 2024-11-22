@@ -104,7 +104,7 @@ export const signUp = async ({ password, ...userData}: SignUpParams) => {
     }
 }
 
-export default async function getLoggedInUser() {
+export default async function getLoggedInUser() {  //was going to add : Promise<User | null> to override this Document type that keeps showing up. It is causing problems in root > page.tsx and other areas. Will have to research this more
   try {
     const { account } = await createSessionClient();
     const result = await account.get();
@@ -136,7 +136,7 @@ export const createLinkToken = async (user: User) => {
         client_user_id: user.$id
       },
       client_name: `${user.firstName} ${user.lastName}`,
-      products: ['auth'] as Products[],
+      products: ['auth','transactions','identity'], //this was just auth and so threw an error blocking transaction data from plaid
       language: 'en',
       country_codes: ['US'] as CountryCode[],
     }

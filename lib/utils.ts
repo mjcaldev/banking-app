@@ -187,7 +187,7 @@ export function decryptId(id: string) {
   return atob(id);
 }
 
-export const getTransactionStatus = (date: Date) => {
+export const getTransactionStatus = (date: Date) => { //cool export to work with getting dates. Left at 2days for testing
   const today = new Date();
   const twoDaysAgo = new Date(today);
   twoDaysAgo.setDate(today.getDate() - 2);
