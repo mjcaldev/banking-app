@@ -35,7 +35,7 @@ export const signIn = async ({ email, password }: signInProps) => {
     const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
     
-    (await cookies()).set("appwrite-session", session.secret, { //added an await here to resolve
+    (await cookies()).set("appwrite-session", session.secret, { //there is an issue arising with .set and Promise<Read Only Request Cookies. Typescript wants me to set an awat to fix this but that is also causing issues with login
      path: "/",
      httpOnly: true,
      sameSite: "strict",
@@ -269,3 +269,22 @@ export const getBank = async ({ documentId }: getBankProps): Promise<Bank |undef
     console.log(error)
   }
 }
+
+export const getBankByAccountId = async ({ accountId }: getBankByAccountIdProps): Promise<Bank |undefined> => {
+  try {
+    const { database } = await createAdminClient();
+
+    const bank = await database.listDocuments<Bank>(
+      DATABASE_ID!,
+      BANK_COLLECTION_ID!,
+      [Query.equal('accountId', [accountId])] // the same as the above function but targeting documentId instead of userId and using getBank(no 'S')props.
+    )
+
+    if(bank.total !== 1) return; // putting "return null" threw an error saying bank cannot reutnr undefined.
+
+    return parseStringify(bank.documents[0]);
+  } catch (error) {
+    console.log(error)
+  }
+}
+

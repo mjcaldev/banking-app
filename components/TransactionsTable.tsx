@@ -8,14 +8,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { formatAmount, formatDateTime, getTransactionStatus, removeSpecialCharacters } from '@/lib/utils'
+import { cn, formatAmount, formatDateTime, getTransactionStatus, removeSpecialCharacters } from '@/lib/utils'
+import { transactionCategoryStyles } from '@/constants'
 
+const CategoryBadge = ({ category }: CategoryBadgeProps) => {
+  const {
+    borderColor,
+    backgroundColor,
+    textColor,
+    chipBackgroundColor
+  } = transactionCategoryStyles[category as keyof typeof transactionCategoryStyles] || transactionCategoryStyles.default
+
+  return (
+    <div className={cn('category-badge', borderColor, chipBackgroundColor)}>
+      <div className={cn('size-2 rounded-full', backgroundColor)} />
+      <p className={cn('text-[12-px] font-medium', textColor)}>
+        {category}
+      </p>
+    </div>
+  )
+}
 
 const TransactionsTable = ({ transactions }: TransactionTableProps) => {   //deconstruct transactions from table body THIS IS WHERE THE DATA IS COMING FROM
   return ( // below in main header added a special class to header "bg-[#f9fafb]"
     //below in table header added class px-2 to add some space
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableCaption>A list of your recent invoices.</TableCaption> {/* */}
       <TableHeader className="bg-[#f9fafb]">                        
         <TableRow>
           <TableHead className="px-2">Transactions</TableHead>
@@ -32,32 +50,37 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {   //dec
         const amount = formatAmount(t.amount)
 
         const isDebit = t.type === 'debit';
-        const isCredit = t.type === 'credit';
+        const isCredit = t.type === 'credit'; 
 
         return (
-          <TableRow key={t.id}>
-            <TableCell>
-              <div>
-                <h1>
+          <TableRow key={t.id} className={`${isDebit || amount[0] === '-' ? 'bg-[#FFFBFA]' : 'bg-[#F6FEF9]'} !over:bg-none !border-b-DEFAULT`}> {/* This ensures there is border formatting regardless of the color  */}
+            <TableCell className="max-w-[250px] pl-2 pr-10">
+              <div className="flex items-center gap-3">
+                <h1 className="text-14 truncate font-semibold text-[#344054]">
                   {removeSpecialCharacters(t.name)}
                 </h1>
               </div>
             </TableCell>
-            <TableCell>
+            <TableCell className={`pl-2 pr-10 font-semibold ${ isDebit || amount[0] === '-' ? 'text-[#f04438]' : 'text-[#039855]'}`}> {/* adds green or red text color depending on transaction value */}
               {isDebit ? `-{amount}` : isCredit ? amount : amount}
             </TableCell>
-            <TableCell>
-              {status}
+            <TableCell className="pl-2 pr-10">
+              <CategoryBadge category={status} />
             </TableCell>
-            <TableCell>
+            <TableCell className="min-w-32 pl-2 pr-10">
               {formatDateTime(new Date(t.date)).dateTime}
+            </TableCell>
+            <TableCell className="pl-2 pr-10 capitalize min-w-24">
+              {t.paymentChannel}
+            </TableCell>
+            <TableCell className="pl-2 pr-10 max-md:hidden">
+            <CategoryBadge category={t.category} />
             </TableCell>
           </TableRow>
         )
        })}
       </TableBody>
     </Table>
-
   )
 }
 

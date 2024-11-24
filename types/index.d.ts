@@ -52,7 +52,7 @@ declare type Account = {
   id: string;
   availableBalance: number;
   currentBalance: number;
-  officialName: string;
+  officialName: string | null; //changed this to accept null due to typing error on My Banks Page
   mask: string;
   institutionId: string;
   name: string;
