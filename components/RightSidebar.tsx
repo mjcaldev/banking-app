@@ -2,8 +2,14 @@ import Link from 'next/link'
 import React from 'react'
 import Image from 'next/image'
 import BankCard from './BankCard'
+import { countTransactionCategories } from '@/lib/utils'
+import Category from './Category'
 
 const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
+
+  const categories: CategoryCount[] = countTransactionCategories(transactions); // declaring categories to be used below in the "Top Categories" section
+
+  console.log(categories)
   return (
     <aside className="right-sidebar">
       <section className="flex flex-col pb-8">
@@ -60,6 +66,18 @@ const RightSidebar = ({ user, transactions, banks }: RightSidebarProps) => {
             )}
           </div>
         )}
+
+        <div className="mt-10 flex flex-1 flex-col">
+          <h2 className="header-2">Top Categories</h2>
+          <div className="space-y-5">
+            {categories.map((category, index) => (
+              <Category 
+                key={category.name} 
+                category={category}
+              />
+            ))}
+          </div>
+        </div>
       </section>
     </aside>
   )

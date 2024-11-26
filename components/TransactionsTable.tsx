@@ -33,7 +33,7 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {   //dec
   return ( // below in main header added a special class to header "bg-[#f9fafb]"
     //below in table header added class px-2 to add some space
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption> {/* */}
+      <TableCaption></TableCaption> {/* */}
       <TableHeader className="bg-[#f9fafb]">                        
         <TableRow>
           <TableHead className="px-2">Transactions</TableHead>
@@ -62,7 +62,7 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {   //dec
               </div>
             </TableCell>
             <TableCell className={`pl-2 pr-10 font-semibold ${ isDebit || amount[0] === '-' ? 'text-[#f04438]' : 'text-[#039855]'}`}> {/* adds green or red text color depending on transaction value */}
-              {isDebit ? `-{amount}` : isCredit ? amount : amount}
+              {isDebit ? `-${amount}` : isCredit ? amount : amount}
             </TableCell>
             <TableCell className="pl-2 pr-10">
               <CategoryBadge category={status} />

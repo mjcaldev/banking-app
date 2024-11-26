@@ -35,7 +35,7 @@ export const signIn = async ({ email, password }: signInProps) => {
     const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
     
-    (await cookies()).set("appwrite-session", session.secret, { //there is an issue arising with .set and Promise<Read Only Request Cookies. Typescript wants me to set an awat to fix this but that is also causing issues with login
+    await (await cookies()).set("appwrite-session", session.secret, { //there is an issue arising with .set and Promise<Read Only Request Cookies. Typescript wants me to set an awat to fix this but that is also causing issues with login
      path: "/",
      httpOnly: true,
      sameSite: "strict",
@@ -46,7 +46,8 @@ export const signIn = async ({ email, password }: signInProps) => {
 
     return parseStringify(user);
     } catch (error) {
-      console.error('Error', error);
+      console.error('Error creating email password session', error);
+      throw error;
     }
 }
 
