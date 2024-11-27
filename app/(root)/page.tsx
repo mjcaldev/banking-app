@@ -26,7 +26,7 @@ const account = await getAccount({ appwriteItemId })
         <header className="home-header">
           <HeaderBox 
           type="greeting"
-          title="Welcome"
+          title="What's good"
           user={loggedIn?.firstName || 'Guest'}
           subtext="Access and manage your account and transactions efficiently."
           />
