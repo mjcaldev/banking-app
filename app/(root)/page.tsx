@@ -5,8 +5,8 @@ import getLoggedInUser from '@/lib/actions/user.actions';
 import { getAccount, getAccounts } from '@/lib/actions/bank.actions';
 import RecentTransactions from '@/components/RecentTransactions';
 
-const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {  //extracting bank data. Can be applied modularly across other components. May need custom hook.
-  // const { id, page } = await searchParams, the following is  possible solution to a error being thrown when signing in. Error says "searchParams should be awaited before using its props"
+const Home = async ({ searchParams }: SearchParamProps) => {  //extracting bank data. Can be applied modularly across other components. May need custom hook.
+  const { id, page } = await searchParams //the following is  possible solution to a error being thrown when signing in. Error says "searchParams should be awaited before using its props"
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser() //(await getLoggedInUser()) as User | null; to ensure User
   if (!loggedIn) return; // addressing the potential null value of loggedIn from getLoggedInUser

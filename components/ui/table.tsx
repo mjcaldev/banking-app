@@ -55,7 +55,7 @@ const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
 >(({ className, ...props }, ref) => (
-  <tr
+  props.children && props.children !== ' ' && <tr //props.children && is a hardcoded solution to return value of props.children if there is empty string being put in the tr element causing a hydration error
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",

@@ -33,7 +33,7 @@ const TransactionsTable = ({ transactions }: TransactionTableProps) => {   //dec
   return ( // below in main header added a special class to header "bg-[#f9fafb]"
     //below in table header added class px-2 to add some space
     <Table>
-      <TableCaption></TableCaption> {/* */}
+      {/* <TableCaption></TableCaption>  */}
       <TableHeader className="bg-[#f9fafb]">                        
         <TableRow>
           <TableHead className="px-2">Transactions</TableHead>
