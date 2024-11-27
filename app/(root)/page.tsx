@@ -24,18 +24,18 @@ const account = await getAccount({ appwriteItemId })
     <section className="home">
       <div className="home-content">
         <header className="home-header">
-         <HeaderBox 
-         type="greeting"
-         title="Welcome"
-         user={loggedIn?.firstName || 'Guest'}
-         subtext="Access and manage your account and transactions efficiently."
-         />
+          <HeaderBox 
+          type="greeting"
+          title="Welcome"
+          user={loggedIn?.firstName || 'Guest'}
+          subtext="Access and manage your account and transactions efficiently."
+          />
 
-        <TotalBalanceBox 
-        accounts={accountsData}
-        totalBanks={accounts?.totalBanks}
-        totalCurrentBalance={accounts?.totalCurrentBalance}
-        />
+          <TotalBalanceBox 
+          accounts={accountsData}
+          totalBanks={accounts?.totalBanks}
+          totalCurrentBalance={accounts?.totalCurrentBalance}
+          />
 
         </header>
         <RecentTransactions 
@@ -46,16 +46,12 @@ const account = await getAccount({ appwriteItemId })
         />
       </div>
       
-      {loggedIn ? (
   <RightSidebar 
     user={loggedIn}
     transactions={account?.transactions}
     banks={accountsData?.slice(0, 2)}
-  />
-) : (
-  <p>Loading user information...</p>
-)}
+  />  
 </section>
-);
+  );
 };
 export default Home
