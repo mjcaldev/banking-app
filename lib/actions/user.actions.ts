@@ -114,7 +114,7 @@ export default async function getLoggedInUser() {  //was going to add : Promise<
 
     return parseStringify(user)
   } catch (error) {
-    return null;
+    return new Error(error);
   }
 }
 
