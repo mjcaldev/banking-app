@@ -1,17 +1,17 @@
 'user server'
 //To delete appwrite Auth users in groups.
 
-import { Client, Users } from 'node-appwrite'
+import { Client, Users } from 'node-appwrite' //here I import Client and Users types from Appwrite SDK (instead of downloading entire library)
 import dotenv from 'dotenv'; // secret/key management
 
-dotenv.config();
+dotenv.config(); // loads from .env to process.env for secure access
 
-const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT) // Your API Endpoint
+const client = new Client() // creating this client instance to load API info and to allow creationg of a Users instance
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT) // Your API Endpoint (these are from Appwrite docs)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT) // Your project ID
-    .setKey(process.env.NEXT_APPWRITE_KEY); // Your secret API key. I am using a variables for security.
+    .setKey(process.env.NEXT_APPWRITE_KEY); // Your secret API key. Unlike appwrite docs, I am using a variables for additional security.
 
-const users = new Users(client);
+const users = new Users(client); //creating instance of Users passing client to manipulate Appwrite users with Users type methods
 
 // This deletes a single user:
 
@@ -29,17 +29,16 @@ async function deleteUserId(userId) {
   }
 }
 
-
 // deleteUserId()
 
 
 // How to repeat this for all users using async batch approach (instead of for loop which is slow or async all which may overload server):
 async function batchDeleteAllUsers(batchSize = 10) {
   try {
-    const usersList = await users.list();
-    let batch = [];
+    const usersList = await users.list(); //Here I am accessing the list method of User type to get the list of users for batch deletion
+    let batch = []; 
 
-    for (let i = 0; i < usersList.users.length; i++) {
+    for (let i = 0; i < usersList.users.length; i++) { //iterating over the list, pushing batches of user ids to the deleteUser function, and then reinitializing the batch array to store the next batch
       batch.push(deleteUserId(usersList.users[i].$id));
 
       if(batch.length === batchSize || i === usersList.users.length - 1) {
