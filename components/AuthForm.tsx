@@ -39,6 +39,14 @@ const formSchema = authFormSchema(type);
       defaultValues: {
         email: "",
         password: "",
+        firstName: type === 'sign-up' ? "" : undefined,
+        lastName: type === 'sign-up' ? "" : undefined,
+        address1: type === 'sign-up' ? "" : undefined,
+        city: type === 'sign-up' ? "" : undefined,
+        state: type === 'sign-up' ? "" : undefined,
+        postalCode: type === 'sign-up' ? "" : undefined,
+        dateOfBirth: type === 'sign-up' ? "" : undefined,
+        ssn: type === 'sign-up' ? "" : undefined,
       },
     })
    
