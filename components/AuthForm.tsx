@@ -39,6 +39,14 @@ const formSchema = authFormSchema(type);
       defaultValues: {
         email: "",
         password: "",
+        firstName: "",
+        lastName: "",
+        address1: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        dateOfBirth: "",
+        ssn: "",
       },
     })
    
@@ -166,15 +174,31 @@ const formSchema = authFormSchema(type);
         </form>
       </Form>
 
-      <footer className="flex justify-center gap-1">
-        <p className="text-14 font-normal text-gray-600">
-          {type === 'sign-in'
-          ? "Don't have an account?"
-          : "Already have an account?"
-          }
-        </p>
-        <Link href={type === 'sign-in' ? '/sign-up' : '/sign-in'} className="form-link">
-        {type === 'sign-in' ? 'Sign up' : 'Sign in'}
+      <footer className="flex flex-col items-center gap-3">
+        <div className="flex justify-center gap-1">
+          <p className="text-14 font-normal text-gray-600">
+            {type === 'sign-in'
+            ? "Don't have an account?"
+            : "Already have an account?"
+            }
+          </p>
+          <Link href={type === 'sign-in' ? '/sign-up' : '/sign-in'} className="form-link">
+            {type === 'sign-in' ? 'Sign up' : 'Sign in'}
+          </Link>
+        </div>
+        <div className="flex items-center gap-2 w-full">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <p className="text-14 font-normal text-gray-600">or</p>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+        <Link href="/" className="w-full">
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="w-full text-16 rounded-lg border border-gray-300 px-4 py-2.5 font-semibold text-gray-700 hover:bg-gray-50"
+          >
+            Continue as Guest
+          </Button>
         </Link>
       </footer>
 

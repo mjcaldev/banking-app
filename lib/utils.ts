@@ -179,12 +179,25 @@ export function extractCustomerIdFromUrl(url: string) {
   return customerId;
 }
 
-export function encryptId(id: string) {
+/**
+ * Encodes an ID using Base64 encoding.
+ * NOTE: This is encoding, NOT encryption. Do not use for sensitive data.
+ * For production, consider using proper encryption for sensitive IDs.
+ */
+export function encryptId(id: string): string {
   return btoa(id);
 }
 
-export function decryptId(id: string) {
-  return atob(id);
+/**
+ * Decodes a Base64 encoded ID.
+ * NOTE: This is decoding, NOT decryption. Do not use for sensitive data.
+ */
+export function decryptId(id: string): string {
+  try {
+    return atob(id);
+  } catch (error) {
+    throw new Error('Invalid encoded ID format');
+  }
 }
 
 export const getTransactionStatus = (date: Date) => { //cool export to work with getting dates. Left at 2days for testing
@@ -220,3 +233,36 @@ export const authFormSchema = (type: string): z.ZodObject<{
   email: z.string().email(),
   password: z.string().min(8),
 })
+
+/**
+ * Creates a guest user object for unauthenticated users
+ */
+export function createGuestUser(): User {
+  return {
+    $id: 'guest',
+    userId: 'guest',
+    email: 'guest@example.com',
+    name: 'Guest User',
+    firstName: 'Guest',
+    lastName: 'User',
+    address1: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    dateOfBirth: '',
+    ssn: '',
+    dwollaCustomerUrl: '',
+    dwollaCustomerId: '',
+    accountId: '',
+    items: [],
+    accessToken: '',
+    image: '',
+  };
+}
+
+/**
+ * Checks if a user is a guest user
+ */
+export function isGuestUser(user: User | null | undefined): boolean {
+  return user?.$id === 'guest' || user?.userId === 'guest';
+}

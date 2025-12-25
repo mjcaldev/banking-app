@@ -28,10 +28,28 @@ import { Textarea } from "./ui/textarea";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
-  name: z.string().min(4, "Transfer note is too short"),
-  amount: z.string().min(4, "Amount is too short"),
-  senderBank: z.string().min(4, "Please select a valid bank account"),
-  sharableId: z.string().min(8, "Please select a valid sharable Id"),
+  name: z.string().min(1, "Transfer note is required").max(100, "Transfer note is too long"),
+  amount: z.string()
+    .min(1, "Amount is required")
+    .refine((val) => {
+      const num = parseFloat(val);
+      return !isNaN(num) && num > 0;
+    }, "Amount must be a positive number")
+    .refine((val) => {
+      const num = parseFloat(val);
+      return num >= 0.01;
+    }, "Amount must be at least $0.01")
+    .refine((val) => {
+      const num = parseFloat(val);
+      return num <= 1000000;
+    }, "Amount cannot exceed $1,000,000")
+    .refine((val) => {
+      // Check for valid decimal format (max 2 decimal places)
+      const decimalParts = val.split('.');
+      return decimalParts.length <= 2 && (decimalParts[1]?.length || 0) <= 2;
+    }, "Amount can have at most 2 decimal places"),
+  senderBank: z.string().min(1, "Please select a source bank account"),
+  sharableId: z.string().min(1, "Please enter a valid shareable ID"),
 });
 
 const PaymentTransferForm = ({ accounts }: PaymentTransferFormProps) => {
@@ -53,44 +71,91 @@ const PaymentTransferForm = ({ accounts }: PaymentTransferFormProps) => {
     setIsLoading(true);
 
     try {
-      const receiverAccountId = decryptId(data.sharableId);
+      // Validate amount is a valid number
+      const amount = parseFloat(data.amount);
+      if (isNaN(amount) || amount <= 0) {
+        form.setError("amount", { message: "Please enter a valid amount" });
+        setIsLoading(false);
+        return;
+      }
+
+      // Decode and validate receiver account
+      let receiverAccountId: string;
+      try {
+        receiverAccountId = decryptId(data.sharableId);
+      } catch (error) {
+        form.setError("sharableId", { message: "Invalid shareable ID format" });
+        setIsLoading(false);
+        return;
+      }
+
       const receiverBank = await getBankByAccountId({
         accountId: receiverAccountId,
       });
+
+      if (!receiverBank) {
+        form.setError("sharableId", { message: "Receiver account not found" });
+        setIsLoading(false);
+        return;
+      }
+
       const senderBank = await getBank({ documentId: data.senderBank });
+
+      if (!senderBank) {
+        form.setError("senderBank", { message: "Sender bank account not found" });
+        setIsLoading(false);
+        return;
+      }
+
+      // Prevent transferring to the same account
+      if (senderBank.accountId === receiverAccountId) {
+        form.setError("sharableId", { message: "Cannot transfer to the same account" });
+        setIsLoading(false);
+        return;
+      }
 
       const transferParams = {
         sourceFundingSourceUrl: senderBank.fundingSourceUrl,
         destinationFundingSourceUrl: receiverBank.fundingSourceUrl,
         amount: data.amount,
       };
+
       // create transfer
       const transfer = await createTransfer(transferParams);
 
+      if (!transfer) {
+        form.setError("root", { message: "Transfer failed. Please try again." });
+        setIsLoading(false);
+        return;
+      }
+
       // create transfer transaction
-      if (transfer) {
-        const transaction = {
-          name: data.name,
-          amount: data.amount,
-          senderId: senderBank.userId.$id,
-          senderBankId: senderBank.$id,
-          receiverId: receiverBank.userId.$id,
-          receiverBankId: receiverBank.$id,
-          email: data.email,
-        };
+      const transaction = {
+        name: data.name,
+        amount: data.amount,
+        senderId: typeof senderBank.userId === 'string' ? senderBank.userId : senderBank.userId?.$id || '',
+        senderBankId: senderBank.$id,
+        receiverId: typeof receiverBank.userId === 'string' ? receiverBank.userId : receiverBank.userId?.$id || '',
+        receiverBankId: receiverBank.$id,
+        email: data.email,
+      };
 
-        const newTransaction = await createTransaction(transaction);
+      const newTransaction = await createTransaction(transaction);
 
-        if (newTransaction) {
-          form.reset();
-          router.push("/");
-        }
+      if (newTransaction) {
+        form.reset();
+        router.push("/");
+      } else {
+        form.setError("root", { message: "Transaction recorded but transfer may have failed. Please verify." });
       }
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
+      form.setError("root", { 
+        message: error instanceof Error ? error.message : "An unexpected error occurred. Please try again." 
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -236,8 +301,14 @@ const PaymentTransferForm = ({ accounts }: PaymentTransferFormProps) => {
           )}
         />
 
+        {form.formState.errors.root && (
+          <div className="text-14 text-red-500 px-4 py-2 bg-red-50 rounded-lg border border-red-200">
+            {form.formState.errors.root.message}
+          </div>
+        )}
+
         <div className="payment-transfer_btn-box">
-          <Button type="submit" className="payment-transfer_btn">
+          <Button type="submit" className="payment-transfer_btn" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 size={20} className="animate-spin" /> &nbsp; Sending...

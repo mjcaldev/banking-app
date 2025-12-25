@@ -9,7 +9,7 @@ const {
   APPWRITE_TRANSACTION_COLLECTION_ID: TRANSACTION_COLLECTION_ID,
 } = process.env;
 
-export const createTransaction = async (transaction: CreateTransactionProps) => {
+export const createTransaction = async (transaction: CreateTransactionProps): Promise<Transaction | null> => {
   try {
     const { database } = await createAdminClient();
 
@@ -22,15 +22,19 @@ export const createTransaction = async (transaction: CreateTransactionProps) => 
         category: 'Transfer',
         ...transaction
       }
-    )
+    );
 
-    return parseStringify(newTransaction);
+    return parseStringify(newTransaction) as Transaction;
   } catch (error) {
-    console.log(error);
+    console.error('Error creating transaction:', error);
+    return null;
   }
 }
 
-export const getTransactionsByBankId = async ({bankId}: getTransactionsByBankIdProps) => {
+export const getTransactionsByBankId = async ({bankId}: getTransactionsByBankIdProps): Promise<{
+  total: number;
+  documents: Transaction[];
+} | null> => {
   try {
     const { database } = await createAdminClient();
 
@@ -38,7 +42,7 @@ export const getTransactionsByBankId = async ({bankId}: getTransactionsByBankIdP
       DATABASE_ID!,
       TRANSACTION_COLLECTION_ID!,
       [Query.equal('senderBankId', bankId)],
-    )
+    );
 
     const receiverTransactions = await database.listDocuments(
       DATABASE_ID!,
@@ -52,10 +56,11 @@ export const getTransactionsByBankId = async ({bankId}: getTransactionsByBankIdP
         ...senderTransactions.documents, 
         ...receiverTransactions.documents,
       ]
-    }
+    };
 
     return parseStringify(transactions);
   } catch (error) {
-    console.log(error);
+    console.error('Error getting transactions by bank ID:', error);
+    return null;
   }
 }

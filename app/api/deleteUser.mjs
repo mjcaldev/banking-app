@@ -1,4 +1,4 @@
-'user server'
+'use server'
 //To delete appwrite Auth users in groups.
 
 import { Client, Users } from 'node-appwrite' //here I import Client and Users types from Appwrite SDK (instead of downloading entire library)
@@ -20,12 +20,13 @@ async function deleteUserId(userId) {
     const userExists = await users.get(userId);
     if(userExists) {
       await users.delete(userId);
-      console.log(`Users ${userId} has been deleted.`)
+      console.log(`User with ID ${userId} has been deleted.`);
+    } else {
+      console.log(`User with ID ${userId} does not exist.`);
     }
-    await users.delete(userId);
-    console.log(`User with ID ${userId} has been deleted.`);
   } catch (error) {
     console.error(`Error deleting ${userId}: ${error}`);
+    throw error; // Re-throw to allow error handling in batch function
   }
 }
 
