@@ -37,9 +37,9 @@ const MobileNav = ({ user }: MobileNavProps) => {
           src="/icons/logo.svg"
           width={34}
           height={34}
-          alt="Mjcal Fintech Logo"
+          alt="Aveno Logo"
           />
-            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Mjcal Fintech</h1>
+            <h1 className="text-30 font-ibm-plex-serif font-bold text-charcoal">Aveno</h1>
           </Link>
           <div className="mobilenav-sheet">
             <SheetClose asChild>
@@ -67,7 +67,7 @@ const MobileNav = ({ user }: MobileNavProps) => {
                         })}
                         />
                       <p className={cn(
-                        'text-16 font-semibold text-black-2', {
+                        'text-16 font-semibold text-charcoal', {
                           'text-white' : isActive
                         }
                       )}>

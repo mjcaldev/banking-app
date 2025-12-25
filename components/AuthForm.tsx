@@ -98,9 +98,9 @@ const formSchema = authFormSchema(type);
           src="/icons/logo.svg"
           width={34}
           height={34}
-          alt="Mjcal Fintech Logo"
+          alt="Aveno Logo"
           />
-            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Mjcal Fintech</h1>
+            <h1 className="text-30 font-ibm-plex-serif font-bold text-charcoal">Aveno</h1>
           </Link>
           <div className="flex flex-col gap-1 md:gap-3">
             <h1 className="text-24 lg:text-36 font-semibold text-gray-900">

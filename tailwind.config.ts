@@ -23,7 +23,17 @@ const config = {
         fill: {
           1: "rgba(255, 255, 255, 0.10)",
         },
-        bankGradient: "#0179FE",
+        // Aveno Theme Colors
+        aveno: {
+          green: "#5C8368", // Primary - Aveno Green
+          wheat: "#D9CBB4", // Secondary - Wheat/Grain Neutral
+          brown: "#3F3A33", // Secondary - Harvest Brown
+          sage: "#AABF9E", // Accent - Light Sage
+          linen: "#F4EFE8", // Accent - Soft Linen
+        },
+        charcoal: "#2C2C2C", // Text color
+        // Legacy support - map old names to new colors
+        bankGradient: "#5C8368", // Aveno Green
         indigo: {
           500: "#6172F3",
           700: "#3538CD",
@@ -56,7 +66,7 @@ const config = {
           1: "#F3F9FF",
         },
         black: {
-          1: "#00214F",
+          1: "#2C2C2C", // Updated to Charcoal
           2: "#344054",
         },
         gray: {
@@ -70,10 +80,10 @@ const config = {
         },
       },
       backgroundImage: {
-        "bank-gradient": "linear-gradient(90deg, #0179FE 0%, #4893FF 100%)",
+        "bank-gradient": "linear-gradient(90deg, #5C8368 0%, #AABF9E 100%)", // Aveno Green to Light Sage
+        "aveno-gradient": "linear-gradient(90deg, #5C8368 0%, #AABF9E 100%)", // Primary gradient
         "gradient-mesh": "url('/icons/gradient-mesh.svg')",
-        "bank-green-gradient":
-          "linear-gradient(90deg, #01797A 0%, #489399 100%)",
+        "bank-green-gradient": "linear-gradient(90deg, #5C8368 0%, #AABF9E 100%)",
       },
       boxShadow: {
         form: "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",

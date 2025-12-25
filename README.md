@@ -1,6 +1,8 @@
-# 🏦 Banking App — Fintech MVP
+# 🌱 Aveno — Banking App
 
 **Live Preview:** https://mjcal-fintech-one.vercel.app/sign-in
+
+Aveno is a modern banking platform built with provision, growth, care, and stability in mind.
 
 ---
 
@@ -61,6 +63,45 @@ The codebase is structured with maintainability and scalability as first-class p
 - Vercel — hosting & preview environments  
 - Environment-based configuration  
 - Secrets managed outside client runtime  
+
+---
+
+## 🔧 Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+### Required for Appwrite
+```
+NEXT_PUBLIC_APPWRITE_ENDPOINT=your_appwrite_endpoint
+NEXT_PUBLIC_APPWRITE_PROJECT=your_appwrite_project_id
+NEXT_APPWRITE_KEY=your_appwrite_api_key
+APPWRITE_DATABASE_ID=your_database_id
+APPWRITE_USER_COLLECTION_ID=your_user_collection_id
+APPWRITE_BANK_COLLECTION_ID=your_bank_collection_id
+APPWRITE_TRANSACTION_COLLECTION_ID=your_transaction_collection_id
+```
+
+### Required for Plaid
+```
+PLAID_CLIENT_ID=your_plaid_client_id
+PLAID_SECRET=your_plaid_secret
+```
+
+### Required for Dwolla
+```
+DWOLLA_ENV=sandbox  # or "production" for production
+DWOLLA_KEY=your_dwolla_key
+DWOLLA_SECRET=your_dwolla_secret
+```
+
+**Note:** If `DWOLLA_ENV` is not set, it will default to `sandbox` in development mode. In production, it must be explicitly set to either `sandbox` or `production`.
+
+### Optional for Sentry
+```
+SENTRY_DSN=your_sentry_dsn
+SENTRY_ORG=your_sentry_org
+SENTRY_PROJECT=your_sentry_project
+```
 
 ---
 

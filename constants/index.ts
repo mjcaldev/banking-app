@@ -35,15 +35,15 @@ export const sidebarLinks = [
 
 export const topCategoryStyles = {
   "Food and Drink": {
-    bg: "bg-blue-25",
-    circleBg: "bg-blue-100",
+    bg: "bg-aveno-linen",
+    circleBg: "bg-aveno-sage",
     text: {
-      main: "text-blue-900",
-      count: "text-blue-700",
+      main: "text-charcoal",
+      count: "text-aveno-brown",
     },
     progress: {
-      bg: "bg-blue-100",
-      indicator: "bg-blue-700",
+      bg: "bg-aveno-sage",
+      indicator: "bg-aveno-green",
     },
     icon: "/icons/monitor.svg",
   },

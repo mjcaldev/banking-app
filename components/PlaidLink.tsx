@@ -48,7 +48,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
           width={24}
           height={24}
         />
-        <p className='text-[16px] font-semibold text-black-2'>Sign in to connect bank</p>
+        <p className='text-[16px] font-semibold text-charcoal'>Sign in to connect bank</p>
       </Link>
     );
   }
@@ -71,7 +71,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
             width={24}
             height={24}
           />
-          <p className='hidden text-[16px] font-semibold text-black-2 xl:block'>Connect bank</p>
+          <p className='hidden text-[16px] font-semibold text-charcoal xl:block'>Connect bank</p>
         </Button>
       ): (
         <Button onClick={() => open()} disabled={!ready || !token} className="plaidlink-default">
@@ -81,7 +81,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
             width={24}
             height={24}
           />
-          <p className='text-[16px] font-semibold text-black-2'>Connect bank</p>
+          <p className='text-[16px] font-semibold text-charcoal'>Connect bank</p>
         </Button>
       )}
     </>

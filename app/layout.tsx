@@ -13,8 +13,8 @@ const ibmPlexSerif = IBM_Plex_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Mjcal Fintech",
-  description: "This is not a real banking application. Do not put sensitive data in here. Thanks!",
+  title: "Aveno",
+  description: "Aveno - Your trusted banking partner. Manage your finances with provision, growth, and care.",
   icons: {
     icon: '/icons/logo.svg'
   }
