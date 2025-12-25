@@ -101,7 +101,11 @@ DWOLLA_SECRET=your_dwolla_secret
 SENTRY_DSN=your_sentry_dsn
 SENTRY_ORG=your_sentry_org
 SENTRY_PROJECT=your_sentry_project
+# Skip Sentry upload during builds (prevents blocking)
+SENTRY_SKIP_UPLOAD=false  # Set to "true" to skip uploads in CI/builds
 ```
+
+**Important:** Sentry is configured to be **non-blocking** - it will never prevent builds or deployments from completing. This follows the production principle: "Observability must never block delivery" (as practiced by AWS, Stripe, Plaid, etc.).
 
 ---
 
