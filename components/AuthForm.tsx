@@ -26,12 +26,14 @@ import { useRouter } from 'next/navigation'
 import getLoggedInUser, { signIn, signUp } from '@/lib/actions/user.actions'
 import { Models } from 'node-appwrite'
 import PlaidLink from './PlaidLink'
+import GuestEmailPrompt from './GuestEmailPrompt'
 
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
   const [user, setUser] = useState<User | null | undefined>(null);
   const [isLoading, setisLoading] = useState(false);
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
 const formSchema = authFormSchema(type);
 
@@ -195,19 +197,45 @@ const formSchema = authFormSchema(type);
         </form>
       </Form>
 
-      <footer className="flex justify-center gap-1">
-        <p className="text-14 font-normal text-gray-600">
-          {type === 'sign-in'
-          ? "Don't have an account?"
-          : "Already have an account?"
-          }
-        </p>
-        <Link href={type === 'sign-in' ? '/sign-up' : '/sign-in'} className="form-link">
-        {type === 'sign-in' ? 'Sign up' : 'Sign in'}
-        </Link>
+      <footer className="flex flex-col gap-4">
+        <div className="flex justify-center gap-1">
+          <p className="text-14 font-normal text-gray-600">
+            {type === 'sign-in'
+            ? "Don't have an account?"
+            : "Already have an account?"
+            }
+          </p>
+          <Link href={type === 'sign-in' ? '/sign-up' : '/sign-in'} className="form-link">
+          {type === 'sign-in' ? 'Sign up' : 'Sign in'}
+          </Link>
+        </div>
+
+        {type === 'sign-in' && (
+          <div className="flex flex-col gap-2">
+            <div className="relative flex items-center gap-2 my-2">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="text-12 font-normal text-gray-500 px-2">or</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowGuestPrompt(true)}
+              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Continue as Guest
+            </Button>
+          </div>
+        )}
       </footer>
 
         </>
+      )}
+
+      {showGuestPrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <GuestEmailPrompt onCancel={() => setShowGuestPrompt(false)} />
+        </div>
       )}
     </section>
   )

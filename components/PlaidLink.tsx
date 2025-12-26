@@ -3,16 +3,25 @@ import { Button } from './ui/button'
 import { PlaidLinkOnSuccess, PlaidLinkOptions, usePlaidLink } from 'react-plaid-link'
 import { useRouter } from 'next/navigation';
 import { createLinkToken, exchangePublicToken } from '@/lib/actions/user.actions';
+import { isGuestUser } from '@/lib/guest';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
   const router = useRouter();
+  const isGuest = isGuestUser() || user?.userId === 'guest';
 
   const [token, setToken] = useState('');
   const [isLoadingToken, setIsLoadingToken] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Skip token fetch for guests
+    if (isGuest) {
+      setIsLoadingToken(false);
+      return;
+    }
+
     const getLinkToken = async () => {
       if (!user) {
         setError('User information is missing');
@@ -39,7 +48,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
     }
 
     getLinkToken();
-  }, [user]);
+  }, [user, isGuest]);
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(async (public_token: string) => {
     await exchangePublicToken({
@@ -66,6 +75,51 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
       <Button disabled className="plaidlink-primary">
         Loading...
       </Button>
+    );
+  }
+
+  // Show upgrade prompt for guests
+  if (isGuest) {
+    return (
+      <div className="flex flex-col gap-2">
+        {variant === 'primary' ? (
+          <Link href="/sign-in" className="w-full">
+            <Button
+              variant="outline"
+              className="plaidlink-primary w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Sign in to connect bank
+            </Button>
+          </Link>
+        ) : variant === 'ghost' ? (
+          <Link href="/sign-in">
+            <Button variant="ghost" className="plaidlink-ghost">
+              <Image 
+                src="/icons/connect-bank.svg"
+                alt="connect bank"
+                width={24}
+                height={24}
+              />
+              <p className='hiddenl text-[16px] font-semibold text-black-2 xl:block'>Sign in to connect</p>
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/sign-in">
+            <Button variant="outline" className="plaidlink-default">
+              <Image 
+                src="/icons/connect-bank.svg"
+                alt="connect bank"
+                width={24}
+                height={24}
+              />
+              <p className='text-[16px] font-semibold text-black-2'>Sign in to connect</p>
+            </Button>
+          </Link>
+        )}
+        <p className="text-12 text-gray-500 text-center mt-1">
+          Sign in or create an account to continue
+        </p>
+      </div>
     );
   }
 

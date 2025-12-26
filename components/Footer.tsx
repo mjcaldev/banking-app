@@ -3,20 +3,31 @@
 import React from 'react'
 import Image from 'next/image'
 import { logoutAccount } from '@/lib/actions/user.actions';
+import { clearGuestUser, isGuestUser } from '@/lib/guest';
 import { useRouter } from 'next/navigation';
 
 const Footer = ({ user, type = "desktop" }: FooterProps) => {
   const router = useRouter();
+  const isGuest = isGuestUser() || user?.userId === 'guest';
   
   const handleLogOut = async () => {
     console.log('[Footer] Logout button clicked');
     
     try {
-      const loggedOut = await logoutAccount();
-      console.log('[Footer] Logout result:', loggedOut);
-      
-      if(loggedOut !== null) {
+      if (isGuest) {
+        // Clear guest state (client-side only)
+        clearGuestUser();
+        // Clear cookie by setting it to expire
+        document.cookie = 'mjcal_guest_email=; path=/; max-age=0';
         router.push('/sign-in');
+      } else {
+        // Logout real user
+        const loggedOut = await logoutAccount();
+        console.log('[Footer] Logout result:', loggedOut);
+        
+        if(loggedOut !== null) {
+          router.push('/sign-in');
+        }
       }
     } catch (error) {
       console.error('[Footer] Logout error:', error);
