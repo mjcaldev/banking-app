@@ -14,16 +14,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import CustomInput from './CustomInput'
+import StateSelect from './StateSelect'
+import DateOfBirthInput from './DateOfBirthInput'
 import { authFormSchema } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import getLoggedInUser, { signIn, signUp } from '@/lib/actions/user.actions'
 import { Models } from 'node-appwrite'
 import PlaidLink from './PlaidLink'
-import { usePlaidLink } from 'react-plaid-link'
 
 
 const AuthForm = ({ type }: { type: string }) => {
@@ -46,7 +48,7 @@ const formSchema = authFormSchema(type);
         state: type === 'sign-up' ? "" : undefined,
         postalCode: type === 'sign-up' ? "" : undefined,
         dateOfBirth: type === 'sign-up' ? "" : undefined,
-        ssn: type === 'sign-up' ? "" : undefined,
+        ssn: type === 'sign-up' ? "123-45-6789" : undefined,
       },
     })
    
@@ -65,7 +67,7 @@ const formSchema = authFormSchema(type);
             state: data.state!,
             postalCode: data.postalCode!,
             dateOfBirth: data.dateOfBirth!,
-            ssn: data.ssn!,
+            ssn: '123-45-6789', // Fixed value
             email: data.email,
             password: data.password
           }
@@ -140,16 +142,34 @@ const formSchema = authFormSchema(type);
               <CustomInput control={form.control} name='city'
                 label="City" placeholder='Enter your city'/>
               <div className="flex gap-4">
-                <CustomInput control={form.control} name='state'
-                label="State" placeholder='Example: NY'/>
+                <StateSelect control={form.control} name='state' label="State" />
                 <CustomInput control={form.control} name='postalCode'
                 label="Postal Code" placeholder='Example: 11101'/>
               </div>
               <div className="flex gap-4">
-                <CustomInput control={form.control} name='dateOfBirth'
-                label="Date of Birth" placeholder='YYYY-MM-DD'/>
-                <CustomInput control={form.control} name='ssn'
-                label="SSN" placeholder='Example: 123-45-6789'/>
+                <DateOfBirthInput control={form.control} name='dateOfBirth' label="Date of Birth" />
+                <FormField
+                  control={form.control}
+                  name="ssn"
+                  render={({ field }) => (
+                    <div className="form-item">
+                      <FormLabel className="form-label">SSN</FormLabel>
+                      <div className="flex w-full flex-col">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value="123-45-6789"
+                            disabled
+                            readOnly
+                            className="input-class bg-gray-100"
+                            onChange={() => {}} // Prevent changes
+                          />
+                        </FormControl>
+                        <FormMessage className="form-message" />
+                      </div>
+                    </div>
+                  )}
+                />
               </div>
             </>
           )}

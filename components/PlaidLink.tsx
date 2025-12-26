@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { Button } from './ui/button'
 import { PlaidLinkOnSuccess, PlaidLinkOptions, usePlaidLink } from 'react-plaid-link'
 import { useRouter } from 'next/navigation';
@@ -48,13 +48,17 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
     })
 
     router.push('/');
-  }, [user])
+  }, [user, router])
   
-  const config: PlaidLinkOptions = {
-    token,
+  // Memoize config to prevent unnecessary re-initializations
+  // Always provide a token (empty string if not ready) to prevent multiple script loads
+  const config: PlaidLinkOptions = useMemo(() => ({
+    token: token || '', // Use empty string if no token yet - hook requires this
     onSuccess
-  }
+  }), [token, onSuccess])
 
+  // Hook must be called unconditionally (React Rules of Hooks)
+  // The library should handle empty tokens gracefully
   const { open, ready } = usePlaidLink(config);
   
   if (isLoadingToken) {

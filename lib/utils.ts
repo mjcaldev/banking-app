@@ -212,9 +212,22 @@ export const authFormSchema = (type: string): z.ZodObject<{
   lastName: type === 'sign-in' ? z.string().optional() : z.string().min(3),
   address1: type === 'sign-in' ? z.string().optional() : z.string().max(50),
   city: type === 'sign-in' ? z.string().optional() : z.string().max(50),
-  state: type === 'sign-in' ? z.string().optional() : z.string().min(2).max(2),
+  state: type === 'sign-in' ? z.string().optional() : z.string().length(2, 'State must be 2 characters'),
   postalCode: type === 'sign-in' ? z.string().optional() : z.string().min(3).max(6),
-  dateOfBirth: type === 'sign-in' ? z.string().optional() : z.string().min(3),
+  dateOfBirth: type === 'sign-in' 
+    ? z.string().optional() 
+    : z.string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+        .refine((dob) => {
+          if (!dob) return false
+          const date = new Date(dob)
+          const today = new Date()
+          const age = today.getFullYear() - date.getFullYear() - 
+            (today < new Date(today.getFullYear(), date.getMonth(), date.getDate()) ? 1 : 0)
+          return age >= 18
+        }, {
+          message: 'User must be at least 18 years old'
+        }),
   ssn: type === 'sign-in' ? z.string().optional() : z.string().min(3),
   //both
   email: z.string().email(),
