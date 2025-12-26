@@ -14,6 +14,27 @@ const {
   APPWRITE_BANK_COLLECTION_ID: BANK_COLLECTION_ID,
 } = process.env
 
+function normalizeDob(dob: string) {
+  // Enforce YYYY-MM-DD exactly
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+    throw new Error("Date of birth must be YYYY-MM-DD");
+  }
+
+  const date = new Date(dob);
+  const today = new Date();
+
+  const age =
+    today.getFullYear() -
+    date.getFullYear() -
+    (today < new Date(today.getFullYear(), date.getMonth(), date.getDate()) ? 1 : 0);
+
+  if (age < 18) {
+    throw new Error("User must be at least 18 years old");
+  }
+
+  return dob;
+}
+
 export const getUserInfo = async ({ userId }: getUserInfoProps) => {
   try {
     const { database } = await createAdminClient();
@@ -52,57 +73,86 @@ export const signIn = async ({ email, password }: signInProps) => {
 }
 
 export const signUp = async ({ password, ...userData}: SignUpParams) => {
-  const { email, firstName, lastName } = userData;
-  
-  let newUserAccount
+  const { account, database, user } = await createAdminClient();
+
+  let newUserAccount: any = null;
 
   try {
-    const { account, database } = await createAdminClient();
+    // 1️⃣ Normalize + validate DOB BEFORE external calls
+    const dateOfBirth = normalizeDob(userData.dateOfBirth);
 
-     newUserAccount = await account.create(
+    // 2️⃣ Create Appwrite user
+    newUserAccount = await account.create(
       ID.unique(),
-      email, 
-      password, 
-      `${firstName} ${lastName}`);
+      userData.email,
+      password,
+      `${userData.firstName} ${userData.lastName}`
+    );
 
-      if(!newUserAccount) throw new Error('Error creating user')
-      
-      const dwollaCustomerUrl = await createDwollaCustomer({
-        ...userData,
-        type: 'personal'
-      })
+    if (!newUserAccount) throw new Error('Error creating user');
 
-      if(!dwollaCustomerUrl) throw new Error('Error creating Dwolla Customer');
-
-      const dwollaCustomerId = extractCustomerIdFromUrl(dwollaCustomerUrl);
-
-      const newUser = await database.createDocument(
-        DATABASE_ID!,
-        USER_COLLECTION_ID!,
-        ID.unique(),
-        {
-          ...userData,
-          userId: newUserAccount.$id,
-          dwollaCustomerId,
-          dwollaCustomerUrl,
-        }
-      )
-
-      const session = await account.createEmailPasswordSession(email, password);
+    // 🔑 Create login session immediately
+    const session = await account.createEmailPasswordSession(
+      userData.email,
+      password
+    );
     
-       (await cookies()).set("appwrite-session", session.secret, { //added an await here to resolve
-        path: "/",
-        httpOnly: true,
-        sameSite: "strict",
-        secure: true,
+    (await cookies()).set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
     });
 
+    // 3️⃣ Create Dwolla customer
+    const dwollaCustomerUrl = await createDwollaCustomer({
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      dateOfBirth,
+      ssn: userData.ssn,
+      address1: userData.address1,
+      city: userData.city,
+      state: userData.state,
+      postalCode: userData.postalCode,
+      type: 'personal'
+    });
 
-
-    return parseStringify(newUser)
-    } catch (error) {
-      console.error('Error', error);
+    if (!dwollaCustomerUrl) {
+      throw new Error("Dwolla customer creation failed");
     }
+
+    // 4️⃣ Persist mapping
+    const dwollaCustomerId = extractCustomerIdFromUrl(dwollaCustomerUrl);
+
+    const newUser = await database.createDocument(
+      DATABASE_ID!,
+      USER_COLLECTION_ID!,
+      ID.unique(),
+      {
+        ...userData,
+        dateOfBirth,
+        userId: newUserAccount.$id,
+        dwollaCustomerId,
+        dwollaCustomerUrl,
+      }
+    );
+
+    return parseStringify(newUser);
+
+  } catch (error) {
+    // 🔁 ROLLBACK Appwrite user if Dwolla fails
+    if (newUserAccount?.$id) {
+      try {
+        await user.delete(newUserAccount.$id);
+      } catch (rollbackError) {
+        console.error('Failed to rollback Appwrite user:', rollbackError);
+      }
+    }
+
+    console.error('Signup failed:', error);
+    throw error;
+  }
 }
 
 export default async function getLoggedInUser() {  //was going to add : Promise<User | null> to override this Document type that keeps showing up. It is causing problems in root > page.tsx and other areas. Will have to research this more
@@ -132,9 +182,13 @@ export const logoutAccount = async () => {
 
 export const createLinkToken = async (user: User) => {
   try {
+    if (!user || !user.userId) {
+      throw new Error('User or userId is missing');
+    }
+
     const tokenParams = {
       user: {
-        client_user_id: user.$id
+        client_user_id: user.userId // Use userId (Appwrite account ID) not $id (document ID)
       },
       client_name: `${user.firstName} ${user.lastName}`,
       products: ['auth','transactions','identity'], //this was just auth and so threw an error blocking transaction data from plaid
@@ -146,7 +200,8 @@ export const createLinkToken = async (user: User) => {
     
     return parseStringify({ linkToken: response.data.link_token })
   } catch (error) {
-    console.log(error);
+    console.error('Error creating Plaid link token:', error);
+    throw error; // Re-throw to allow proper error handling
   }
 }
 
