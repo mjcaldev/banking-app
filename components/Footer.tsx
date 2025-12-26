@@ -18,7 +18,7 @@ const Footer = ({ user, type = "desktop" }: FooterProps) => {
         // Clear guest state (client-side only)
         clearGuestUser();
         // Clear cookie by setting it to expire
-        document.cookie = 'mjcal_guest_email=; path=/; max-age=0';
+        document.cookie = 'luno_guest_email=; path=/; max-age=0';
         router.push('/sign-in');
       } else {
         // Logout real user

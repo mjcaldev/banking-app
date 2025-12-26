@@ -37,9 +37,9 @@ const MobileNav = ({ user }: MobileNavProps) => {
           src="/icons/logo.svg"
           width={34}
           height={34}
-          alt="Mjcal Fintech Logo"
+          alt="Luno Logo"
           />
-            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Mjcal Fintech</h1>
+            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Luno</h1>
           </Link>
           <div className="mobilenav-sheet">
             <SheetClose asChild>

@@ -5,7 +5,7 @@
 
 import { cookies } from 'next/headers'
 
-const GUEST_COOKIE_KEY = 'mjcal_guest_email'
+const GUEST_COOKIE_KEY = 'luno_guest_email'
 
 /**
  * Check if user is a guest (server-side)
