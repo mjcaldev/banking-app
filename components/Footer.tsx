@@ -1,17 +1,28 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
 import { logoutAccount } from '@/lib/actions/user.actions';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Footer = ({ user, type = "desktop" }: FooterProps) => {
+  const router = useRouter();
+  
   const handleLogOut = async () => {
-    const router = useRouter();
+    console.log('[Footer] Logout button clicked');
     
-
-    const loggedOut = await logoutAccount()
-
-    if(loggedOut) router.push('/sign-in')
+    try {
+      const loggedOut = await logoutAccount();
+      console.log('[Footer] Logout result:', loggedOut);
+      
+      if(loggedOut !== null) {
+        router.push('/sign-in');
+      }
+    } catch (error) {
+      console.error('[Footer] Logout error:', error);
+    }
   }
+  
   return (
     <footer className="footer">
       <div className={type === 'mobile' ?
@@ -25,7 +36,19 @@ const Footer = ({ user, type = "desktop" }: FooterProps) => {
           <h1 className="text-14 truncate text-gray-700 font-semibold">{user?.firstName}</h1>
           <p className="text-14 truncate font-normal text-gray-600">{user?.email}</p>
       </div>
-      <div className="footer_image">
+      <div 
+        className="footer_image cursor-pointer"
+        onClick={handleLogOut}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleLogOut();
+          }
+        }}
+        aria-label="Logout"
+      >
         <Image src="icons/logout.svg" fill alt="logout" />
       </div>
     </footer>
