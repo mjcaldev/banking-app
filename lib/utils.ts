@@ -86,16 +86,17 @@ interface UrlQueryParams {
   params: string;
   key: string;
   value: string;
+  pathname?: string;
 }
 
-export function formUrlQuery({ params, key, value }: UrlQueryParams) {
+export function formUrlQuery({ params, key, value, pathname }: UrlQueryParams) {
   const currentUrl = qs.parse(params);
 
   currentUrl[key] = value;
 
   return qs.stringifyUrl(
     {
-      url: window.location.pathname,
+      url: pathname || (typeof window !== 'undefined' ? window.location.pathname : '/'),
       query: currentUrl,
     },
     { skipNull: true }

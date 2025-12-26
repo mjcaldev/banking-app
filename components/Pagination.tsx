@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { formUrlQuery } from "@/lib/utils";
 
 export const Pagination = ({ page, totalPages }: PaginationProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams()!;
 
   const handleNavigation = (type: "prev" | "next") => {
@@ -17,6 +18,7 @@ export const Pagination = ({ page, totalPages }: PaginationProps) => {
       params: searchParams.toString(),
       key: "page",
       value: pageNumber.toString(),
+      pathname: pathname,
     });
 
     router.push(newUrl, { scroll: false });
@@ -25,10 +27,15 @@ export const Pagination = ({ page, totalPages }: PaginationProps) => {
   return (
     <div className="flex justify-between gap-3">
       <Button
+        type="button"
         size="lg"
         variant="ghost"
         className="p-0 hover:bg-transparent"
-        onClick={() => handleNavigation("prev")}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleNavigation("prev");
+        }}
         disabled={Number(page) <= 1}
       >
         <Image
@@ -43,11 +50,16 @@ export const Pagination = ({ page, totalPages }: PaginationProps) => {
       <p className="text-14 flex items-center px-2">
         {page} / {totalPages}
       </p>
-      <Button //modifies url bar to contain value of the page in the url and navigate through pages of transactions
+      <Button
+        type="button"
         size="lg"
         variant="ghost"
         className="p-0 hover:bg-transparent"
-        onClick={() => handleNavigation("next")}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleNavigation("next");
+        }}
         disabled={Number(page) >= totalPages}
       >
         Next
