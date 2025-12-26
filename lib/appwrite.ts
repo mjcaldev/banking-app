@@ -4,14 +4,20 @@ import { Client, Account, Databases, Users } from "node-appwrite";
 import { cookies } from "next/headers";
 
 export async function createSessionClient() {
+  // Use APPWRITE_* variables (server-side only, matches createAdminClient)
+  const endpoint = process.env.APPWRITE_ENDPOINT;
+  const projectId = process.env.APPWRITE_PROJECT_ID;
+  
   const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
+    .setEndpoint(endpoint!)
+    .setProject(projectId!);
 
-  const session = (await cookies()).get("appwrite-session"); //added await here to allow the get to happen after cookies are imported
+  const cookieStore = await cookies();
+  const session = cookieStore.get("appwrite-session");
 
+  // Return null instead of throwing - let caller handle missing session
   if (!session || !session.value) {
-    throw new Error("No session");
+    return null;
   }
 
   client.setSession(session.value);
@@ -24,10 +30,14 @@ export async function createSessionClient() {
 }
 
 export async function createAdminClient() {
+  const endpoint = process.env.APPWRITE_ENDPOINT;
+  const projectId = process.env.APPWRITE_PROJECT_ID;
+  const apiKey = process.env.APPWRITE_API_KEY;
+  
   const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT!)
-    .setProject(process.env.APPWRITE_PROJECT_ID!)
-    .setKey(process.env.APPWRITE_API_KEY!);
+    .setEndpoint(endpoint!)
+    .setProject(projectId!)
+    .setKey(apiKey!);
 
   return {
     get account() {

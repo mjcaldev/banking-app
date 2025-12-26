@@ -75,6 +75,7 @@ const formSchema = authFormSchema(type);
           const newUser = await signUp(userData);
 
           setUser(newUser as unknown as User);
+          // PlaidLink component will handle navigation after bank linking succeeds
         }
 
         if (type === 'sign-in') {

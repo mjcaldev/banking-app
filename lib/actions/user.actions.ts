@@ -157,26 +157,48 @@ export const signUp = async ({ password, ...userData}: SignUpParams) => {
 
 export default async function getLoggedInUser() {  //was going to add : Promise<User | null> to override this Document type that keeps showing up. It is causing problems in root > page.tsx and other areas. Will have to research this more
   try {
-    const { account } = await createSessionClient();
+    const sessionClient = await createSessionClient();
+    
+    // Explicitly check for null session instead of relying on exceptions
+    if (!sessionClient) {
+      return null;
+    }
+
+    const { account } = sessionClient;
     const result = await account.get();
 
     const user = await getUserInfo({ userId: result.$id})
 
     return parseStringify(user)
   } catch (error) {
+    // Log error for debugging but return null gracefully
+    console.error('Error getting logged in user:', error);
     return null;
   }
 }
 
 export const logoutAccount = async () => {
   try {
-    const { account } = await createSessionClient();
+    const sessionClient = await createSessionClient();
+    
+    if (!sessionClient) {
+      // No session to delete, just clear the cookie
+      (await cookies()).delete('appwrite-session');
+      return;
+    }
 
+    const { account } = sessionClient;
     (await cookies()).delete('appwrite-session'); //added await here to resolve the error
 
     await account.deleteSession('current');
   } catch (error) {
-    return null;
+    console.error('Error during logout:', error);
+    // Still try to clear the cookie even if session deletion fails
+    try {
+      (await cookies()).delete('appwrite-session');
+    } catch (cookieError) {
+      console.error('Error clearing cookie:', cookieError);
+    }
   }
 }
 
