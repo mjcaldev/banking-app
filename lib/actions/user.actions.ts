@@ -213,7 +213,7 @@ export const createLinkToken = async (user: User) => {
         client_user_id: user.userId // Use userId (Appwrite account ID) not $id (document ID)
       },
       client_name: `${user.firstName} ${user.lastName}`,
-      products: ['auth','transactions','identity'], //this was just auth and so threw an error blocking transaction data from plaid
+      products: ['auth','transactions','identity'] as Products[], //this was just auth and so threw an error blocking transaction data from plaid
       language: 'en',
       country_codes: ['US'] as CountryCode[],
     }
@@ -237,6 +237,13 @@ shareableId,
 
 }: createBankAccountProps) => {
   try {
+    // Check if account already exists
+    const existingBank = await getBankByAccountId({ accountId });
+    if (existingBank) {
+      console.log(`Bank account with accountId ${accountId} already exists`);
+      return { success: false, error: 'Account already exists', bank: parseStringify(existingBank) };
+    }
+
     const { database } = await createAdminClient();
 
     const bankAccount = await database.createDocument(
@@ -253,11 +260,11 @@ shareableId,
       }
     )
 
-    return parseStringify(bankAccount)
-
+    return { success: true, bank: parseStringify(bankAccount) };
 
   } catch (error) {
-    
+    console.error(`Error creating bank account for accountId ${accountId}:`, error);
+    throw error; // Re-throw to allow proper error handling upstream
   }
 }
 
@@ -274,45 +281,93 @@ export const exchangePublicToken = async ({
     const accessToken = response.data.access_token;
     const itemId = response.data.item_id;
 
-    //Get account information from Plaid using the access token
+    //Get all accounts from Plaid using the access token
     const accountsResponse = await plaidClient.accountsGet({
       access_token: accessToken,
     });
 
-    const accountData = accountsResponse.data.accounts[0];
+    const allAccounts = accountsResponse.data.accounts;
+    const results = {
+      created: [] as string[],
+      skipped: [] as string[],
+      errors: [] as { accountId: string; error: string }[],
+    };
 
-    //Create a processor token for Dwolla using the access token and account ID
-    const request : ProcessorTokenCreateRequest = {
-      access_token: accessToken,
-      account_id: accountData.account_id,
-      processor: "dwolla" as ProcessorTokenCreateRequestProcessorEnum,
+    //Process each account returned by Plaid
+    for (const accountData of allAccounts) {
+      try {
+        //Check if account already exists
+        const existingBank = await getBankByAccountId({ accountId: accountData.account_id });
+        if (existingBank) {
+          console.log(`Account ${accountData.account_id} (${accountData.name}) already exists, skipping`);
+          results.skipped.push(accountData.account_id);
+          continue;
+        }
+
+        //Create a processor token for Dwolla using the access token and account ID
+        const request : ProcessorTokenCreateRequest = {
+          access_token: accessToken,
+          account_id: accountData.account_id,
+          processor: "dwolla" as ProcessorTokenCreateRequestProcessorEnum,
+        }
+
+        const processorTokenResponse = await plaidClient.processorTokenCreate(request);
+        const processorToken = processorTokenResponse.data.processor_token;
+
+        //Create a funding source URL for the account using the Dwolla customer ID, processor token, and bank name
+        const fundingSourceUrl = await addFundingSource({
+          dwollaCustomerId: user.dwollaCustomerId,
+          processorToken,
+          bankName: accountData.name,
+        })
+
+        //If the funding source URL is not created, skip this account
+        if(!fundingSourceUrl) {
+          console.error(`Failed to create funding source for account ${accountData.account_id}`);
+          results.errors.push({ accountId: accountData.account_id, error: 'Failed to create funding source' });
+          continue;
+        }
+
+        //Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and shareable ID
+        const createResult = await createBankAccount({
+          userId: user.$id,
+          bankId: itemId,
+          accountId: accountData.account_id,
+          accessToken,
+          fundingSourceUrl,
+          shareableId: encryptId(accountData.account_id),
+        });
+
+        if (createResult.success) {
+          results.created.push(accountData.account_id);
+          console.log(`Successfully created bank account for ${accountData.account_id} (${accountData.name})`);
+        } else {
+          results.skipped.push(accountData.account_id);
+        }
+
+      } catch (accountError) {
+        console.error(`Error processing account ${accountData.account_id}:`, accountError);
+        results.errors.push({ 
+          accountId: accountData.account_id, 
+          error: accountError instanceof Error ? accountError.message : 'Unknown error' 
+        });
+        // Continue processing other accounts even if one fails
+      }
     }
 
-    const processorTokenResponse = await plaidClient.processorTokenCreate(request);
-    const processorToken = processorTokenResponse.data.processor_token;
+    //Log summary
+    console.log(`Bank linking complete: ${results.created.length} created, ${results.skipped.length} skipped, ${results.errors.length} errors`);
 
-    //Create a funding source URL for the account using the Dwolla customer ID, processor token, and bank name
-    const fundingSourceUrl = await addFundingSource({
-      dwollaCustomerId: user.dwollaCustomerId,
-      processorToken,
-      bankName: accountData.name,
-    })
+    //If at least one account was created, consider it a success
+    if (results.created.length === 0 && results.errors.length > 0) {
+      throw new Error(`Failed to link any accounts: ${results.errors.map(e => `${e.accountId} (${e.error})`).join(', ')}`);
+    }
 
-    //If the funding source URL is not created, thow an error
-    if(!fundingSourceUrl) throw Error;
-
-    //Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and shareable ID
-    await createBankAccount({
-      userId: user.$id,
-      bankId: itemId,
-      accountId: accountData.account_id,
-      accessToken,
-      fundingSourceUrl,
-      shareableId: encryptId(accountData.account_id),
-    });
+    return results;
 
   } catch (error) {
-    console.error("An error occurred while creating exchange token:", error)
+    console.error("An error occurred while exchanging public token:", error);
+    throw error; // Re-throw to allow proper error handling upstream
   }
 }
 
@@ -336,13 +391,13 @@ export const getBank = async ({ documentId }: getBankProps): Promise<Bank |undef
   try {
     const { database } = await createAdminClient();
 
-    const bank = await database.listDocuments<Bank>(
+    const bank = await database.listDocuments(
       DATABASE_ID!,
       BANK_COLLECTION_ID!,
       [Query.equal('$id', [documentId])] // the same as the above function but targeting documentId instead of userId and using getBank(no 'S')props.
     )
 
-    return parseStringify(bank.documents[0]);
+    return parseStringify(bank.documents[0] as unknown as Bank);
   } catch (error) {
     console.log(error)
   }
@@ -352,7 +407,7 @@ export const getBankByAccountId = async ({ accountId }: getBankByAccountIdProps)
   try {
     const { database } = await createAdminClient();
 
-    const bank = await database.listDocuments<Bank>(
+    const bank = await database.listDocuments(
       DATABASE_ID!,
       BANK_COLLECTION_ID!,
       [Query.equal('accountId', [accountId])] // the same as the above function but targeting documentId instead of userId and using getBank(no 'S')props.
@@ -360,7 +415,7 @@ export const getBankByAccountId = async ({ accountId }: getBankByAccountIdProps)
 
     if(bank.total !== 1) return; // putting "return null" threw an error saying bank cannot reutnr undefined.
 
-    return parseStringify(bank.documents[0]);
+    return parseStringify(bank.documents[0] as unknown as Bank);
   } catch (error) {
     console.log(error)
   }

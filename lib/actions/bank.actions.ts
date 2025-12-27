@@ -18,38 +18,78 @@ import { getBanks, getBank } from "./user.actions";
 // Get multiple bank accounts
 export const getAccounts = async ({ userId }: getAccountsProps) => {
   try {
-    // get banks from db
+    // get banks from db - each bank document represents one account
     const banks = await getBanks({ userId });
-    if (!banks) return;
+    if (!banks || banks.length === 0) return;
+
     const accounts = await Promise.all(
-      banks?.map(async (bank: Bank) => {
-        // get each account info from plaid
+      banks.map(async (bank: Bank) => {
+        try {
+          // get all accounts from plaid for this access token
+          const accountsResponse = await plaidClient.accountsGet({
+            access_token: bank.accessToken,
+          });
 
-        const accountsResponse = await plaidClient.accountsGet({
-          access_token: bank.accessToken,
-        });
-        const accountData = accountsResponse.data.accounts[0];
+          // Find the account that matches the accountId stored in our database
+          const accountData = accountsResponse.data.accounts.find(
+            (acc) => acc.account_id === bank.accountId
+          );
 
-        // get institution info from plaid
-        const institution = await getInstitution({
-          institutionId: accountsResponse.data.item.institution_id!,
-        });
+          if (!accountData) {
+            console.error(`Account ${bank.accountId} not found in Plaid response`);
+            // Return a fallback account object with data from database
+            return {
+              id: bank.accountId,
+              availableBalance: 0,
+              currentBalance: 0,
+              institutionId: '',
+              name: 'Account not found',
+              officialName: null,
+              mask: '',
+              type: 'unknown',
+              subtype: 'unknown',
+              appwriteItemId: bank.$id,
+              shareableId: bank.shareableId,
+            };
+          }
 
-        const account = {
-          id: accountData.account_id,
-          availableBalance: accountData.balances.available!,
-          currentBalance: accountData.balances.current!,
-          institutionId: institution.institution_id,
-          name: accountData.name,
-          officialName: accountData.official_name,
-          mask: accountData.mask!,
-          type: accountData.type as string,
-          subtype: accountData.subtype! as string,
-          appwriteItemId: bank.$id,
-          shareableId: bank.shareableId,
-        };
+          // get institution info from plaid
+          const institution = await getInstitution({
+            institutionId: accountsResponse.data.item.institution_id!,
+          });
 
-        return account;
+          const account = {
+            id: accountData.account_id,
+            availableBalance: accountData.balances.available ?? 0,
+            currentBalance: accountData.balances.current ?? 0,
+            institutionId: institution.institution_id,
+            name: accountData.name,
+            officialName: accountData.official_name ?? null,
+            mask: accountData.mask ?? '',
+            type: accountData.type as string,
+            subtype: accountData.subtype ?? '',
+            appwriteItemId: bank.$id,
+            shareableId: bank.shareableId,
+          };
+
+          return account;
+        } catch (error) {
+          console.error(`Error fetching account details for bank ${bank.$id}:`, error);
+          // Return a fallback account object
+          return {
+            id: bank.accountId,
+            availableBalance: 0,
+            currentBalance: 0,
+            institutionId: '',
+            name: 'Error loading account',
+            officialName: null,
+            mask: '',
+            type: 'unknown',
+            subtype: 'unknown',
+            appwriteItemId: bank.$id,
+            shareableId: bank.shareableId,
+          };
+        }
       })
     );
 
@@ -61,28 +101,39 @@ export const getAccounts = async ({ userId }: getAccountsProps) => {
     return parseStringify({ data: accounts, totalBanks, totalCurrentBalance });
   } catch (error) {
     console.error("An error occurred while getting the accounts:", error);
+    throw error;
   }
 };
 
 // Get one bank account
 export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
   try {
-    // get bank from db
+    // get bank from db - this represents one account
     const bank = await getBank({ documentId: appwriteItemId });
-    // console.log(bank);
-    if (!bank) return;
-    // get account info from plaid
+    if (!bank) {
+      throw new Error(`Bank account with ID ${appwriteItemId} not found`);
+    }
+
+    // get all accounts from plaid for this access token
     const accountsResponse = await plaidClient.accountsGet({
       access_token: bank.accessToken,
     });
-    const accountData = accountsResponse.data.accounts[0];
+
+    // Find the account that matches the accountId stored in our database
+    const accountData = accountsResponse.data.accounts.find(
+      (acc) => acc.account_id === bank.accountId
+    );
+
+    if (!accountData) {
+      throw new Error(`Account ${bank.accountId} not found in Plaid response`);
+    }
 
     // get transfer transactions from appwrite
     const transferTransactionsData = await getTransactionsByBankId({
       bankId: bank.$id,
     });
 
-    const transferTransactions = transferTransactionsData!.documents.map(
+    const transferTransactions = transferTransactionsData?.documents.map(
       (transferData: Transaction) => ({
         id: transferData.$id,
         name: transferData.name!,
@@ -92,31 +143,42 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
         category: transferData.category,
         type: transferData.senderBankId === bank.$id ? "debit" : "credit",
       })
-    );
+    ) || [];
+
     // get institution info from plaid
     const institution = await getInstitution({
       institutionId: accountsResponse.data.item.institution_id!,
     });
 
-    const transactions = (await getTransactions({
-      accessToken: bank?.accessToken,
+    if (!institution) {
+      throw new Error('Failed to get institution information');
+    }
+
+    // get transactions for this specific account
+    const allPlaidTransactions = (await getTransactions({
+      accessToken: bank.accessToken,
     })) || [];
+
+    // Filter transactions to only include those for this account
+    const transactions = allPlaidTransactions.filter(
+      (txn: any) => txn.accountId === bank.accountId
+    );
 
     const account = {
       id: accountData.account_id,
-      availableBalance: accountData.balances.available!,
-      currentBalance: accountData.balances.current!,
-      institutionId: institution!.institution_id,
+      availableBalance: accountData.balances.available ?? 0,
+      currentBalance: accountData.balances.current ?? 0,
+      institutionId: institution.institution_id,
       name: accountData.name,
-      officialName: accountData.official_name,
-      mask: accountData.mask!,
+      officialName: accountData.official_name ?? null,
+      mask: accountData.mask ?? '',
       type: accountData.type as string,
-      subtype: accountData.subtype! as string,
+      subtype: accountData.subtype ?? '',
       appwriteItemId: bank.$id,
     };
 
     // sort transactions by date such that the most recent transaction is first
-      const allTransactions = [...transactions, ...transferTransactions].sort(
+    const allTransactions = [...transactions, ...transferTransactions].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
@@ -126,6 +188,7 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
     });
   } catch (error) {
     console.error("An error occurred while getting the account:", error);
+    throw error;
   }
 };
 
