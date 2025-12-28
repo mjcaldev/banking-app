@@ -54,16 +54,30 @@ TableFooter.displayName = "TableFooter"
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
-  props.children && props.children !== ' ' && <tr //props.children && is a hardcoded solution to return value of props.children if there is empty string being put in the tr element causing a hydration error
-    ref={ref}
-    className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, children, ...props }, ref) => {
+  // Filter out whitespace-only text nodes
+  const filteredChildren = React.Children.toArray(children).filter(
+    (child) => {
+      if (typeof child === 'string') {
+        return child.trim() !== '';
+      }
+      return true;
+    }
+  );
+
+  return (
+    <tr
+      ref={ref}
+      className={cn(
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        className
+      )}
+      {...props}
+    >
+      {filteredChildren}
+    </tr>
+  );
+})
 TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
