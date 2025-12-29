@@ -61,7 +61,7 @@ export const topCategoryStyles = {
       bg: "bg-blue-100",
       indicator: "bg-blue-700",
     },
-    icon: "/icons/monitor.svg",
+    icon: "/icons/dollar.svg",
   },
   Travel: {
     bg: "bg-success-25",
@@ -75,6 +75,175 @@ export const topCategoryStyles = {
       indicator: "bg-success-700",
     },
     icon: "/icons/coins.svg",
+  },
+  Payment: {
+    bg: "bg-success-25",
+    circleBg: "bg-success-100",
+    text: {
+      main: "text-success-900",
+      count: "text-success-700",
+    },
+    progress: {
+      bg: "bg-success-100",
+      indicator: "bg-success-700",
+    },
+    icon: "/icons/credit-card.svg",
+  },
+  "Bank Fees": {
+    bg: "bg-success-25",
+    circleBg: "bg-success-100",
+    text: {
+      main: "text-success-900",
+      count: "text-success-700",
+    },
+    progress: {
+      bg: "bg-success-100",
+      indicator: "bg-success-700",
+    },
+    icon: "/icons/dollar-circle.svg",
+  },
+  Transfer: {
+    bg: "bg-gray-25",
+    circleBg: "bg-gray-200",
+    text: {
+      main: "text-gray-900",
+      count: "text-gray-700",
+    },
+    progress: {
+      bg: "bg-gray-200",
+      indicator: "bg-gray-700",
+    },
+    icon: "/icons/bank-transfer.svg",
+  },
+  Processing: {
+    bg: "bg-gray-25",
+    circleBg: "bg-gray-200",
+    text: {
+      main: "text-gray-900",
+      count: "text-gray-700",
+    },
+    progress: {
+      bg: "bg-gray-200",
+      indicator: "bg-gray-500",
+    },
+    icon: "/icons/loader.svg",
+  },
+  Success: {
+    bg: "bg-success-25",
+    circleBg: "bg-success-100",
+    text: {
+      main: "text-success-900",
+      count: "text-success-700",
+    },
+    progress: {
+      bg: "bg-success-100",
+      indicator: "bg-[#12B76A]",
+    },
+    icon: "/icons/coins.svg",
+  },
+  Uncategorized: {
+    bg: "bg-gray-25",
+    circleBg: "bg-gray-200",
+    text: {
+      main: "text-gray-900",
+      count: "text-gray-700",
+    },
+    progress: {
+      bg: "bg-gray-200",
+      indicator: "bg-gray-500",
+    },
+    icon: "/icons/transaction.svg",
+  },
+  "General Merchandise": {
+    bg: "bg-blue-25",
+    circleBg: "bg-blue-100",
+    text: {
+      main: "text-blue-900",
+      count: "text-blue-700",
+    },
+    progress: {
+      bg: "bg-blue-100",
+      indicator: "bg-blue-700",
+    },
+    icon: "/icons/shopping-bag.svg",
+  },
+  "General Services": {
+    bg: "bg-success-25",
+    circleBg: "bg-success-100",
+    text: {
+      main: "text-success-900",
+      count: "text-success-700",
+    },
+    progress: {
+      bg: "bg-success-100",
+      indicator: "bg-success-700",
+    },
+    icon: "/icons/monitor.svg",
+  },
+  Entertainment: {
+    bg: "bg-red-50",
+    circleBg: "bg-red-100",
+    text: {
+      main: "text-red-900",
+      count: "text-red-700",
+    },
+    progress: {
+      bg: "bg-red-100",
+      indicator: "bg-red-700",
+    },
+    icon: "/icons/shopping-bag.svg",
+  },
+  Income: {
+    bg: "bg-success-25",
+    circleBg: "bg-success-100",
+    text: {
+      main: "text-success-900",
+      count: "text-success-700",
+    },
+    progress: {
+      bg: "bg-success-100",
+      indicator: "bg-success-700",
+    },
+    icon: "/icons/dollar-circle.svg",
+  },
+  "Rent and Utilities": {
+    bg: "bg-blue-25",
+    circleBg: "bg-blue-100",
+    text: {
+      main: "text-blue-900",
+      count: "text-blue-700",
+    },
+    progress: {
+      bg: "bg-blue-100",
+      indicator: "bg-blue-700",
+    },
+    icon: "/icons/home.svg",
+  },
+  "General Business": {
+    bg: "bg-gray-25",
+    circleBg: "bg-gray-200",
+    text: {
+      main: "text-gray-900",
+      count: "text-gray-700",
+    },
+    progress: {
+      bg: "bg-gray-200",
+      indicator: "bg-gray-500",
+    },
+    icon: "/icons/monitor.svg",
+  },
+  "Government and Public Services": {
+    bg: "bg-gray-25",
+    circleBg: "bg-gray-200",
+    text: {
+      main: "text-gray-900",
+      count: "text-gray-700",
+    },
+    progress: {
+      bg: "bg-gray-200",
+      indicator: "bg-gray-500",
+    },
+    icon: "/icons/monitor.svg",
   },
   default: {
     bg: "bg-pink-25",

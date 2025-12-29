@@ -15,6 +15,40 @@ import { parseStringify } from "../utils";
 import { getTransactionsByBankId } from "./transaction.actions";
 import { getBanks, getBank } from "./user.actions";
 
+// Helper function to map Plaid's personal_finance_category to our category names
+function mapPlaidCategoryToCategoryName(plaidCategory: string): string {
+  // Plaid categories are typically in UPPER_SNAKE_CASE format
+  const categoryMap: { [key: string]: string } = {
+    "FOOD_AND_DRINK": "Food and Drink",
+    "GENERAL_MERCHANDISE": "General Merchandise",
+    "GENERAL_SERVICES": "General Services",
+    "GOVERNMENT_AND_PUBLIC_SERVICES": "Government and Public Services",
+    "TRANSPORTATION": "Travel",
+    "TRAVEL": "Travel",
+    "RENT_AND_UTILITIES": "Rent and Utilities",
+    "ENTERTAINMENT": "Entertainment",
+    "LOAN_PAYMENTS": "Payment",
+    "BANK_FEES": "Bank Fees",
+    "GENERAL_BUSINESS": "General Business",
+    "TRANSFER_IN": "Transfer",
+    "TRANSFER_OUT": "Transfer",
+    "INCOME": "Income",
+    "OTHER": "Uncategorized",
+  };
+
+  // Check if we have a direct mapping
+  if (categoryMap[plaidCategory]) {
+    return categoryMap[plaidCategory];
+  }
+
+  // If no direct mapping, convert UPPER_SNAKE_CASE to Title Case
+  // e.g., "FOOD_AND_DRINK" -> "Food And Drink"
+  return plaidCategory
+    .split("_")
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
 // Get multiple bank accounts
 export const getAccounts = async ({ userId }: getAccountsProps) => {
   try {
@@ -226,18 +260,31 @@ export const getTransactions = async ({
 
       const data = response.data;
 
-      transactions = response.data.added.map((transaction) => ({
-        id: transaction.transaction_id,
-        name: transaction.name,
-        paymentChannel: transaction.payment_channel,
-        type: transaction.payment_channel,
-        accountId: transaction.account_id,
-        amount: transaction.amount,
-        pending: transaction.pending,
-        category: transaction.category ? transaction.category[0] : "",
-        date: transaction.date,
-        image: transaction.logo_url,
-      }));
+      transactions = response.data.added.map((transaction) => {
+        // Extract category from personal_finance_category (preferred) or fallback to category array
+        let category = "";
+        if (transaction.personal_finance_category?.primary) {
+          // Map Plaid's category to our category name format
+          category = mapPlaidCategoryToCategoryName(
+            transaction.personal_finance_category.primary
+          );
+        } else if (transaction.category && transaction.category.length > 0) {
+          category = transaction.category[0];
+        }
+
+        return {
+          id: transaction.transaction_id,
+          name: transaction.name,
+          paymentChannel: transaction.payment_channel,
+          type: transaction.payment_channel,
+          accountId: transaction.account_id,
+          amount: transaction.amount,
+          pending: transaction.pending,
+          category: category,
+          date: transaction.date,
+          image: transaction.logo_url,
+        };
+      });
 
       hasMore = data.has_more;
     }

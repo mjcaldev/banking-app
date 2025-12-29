@@ -141,7 +141,12 @@ export function countTransactionCategories(
   if (transactions) {
     transactions.forEach((transaction) => {
       // Extract the category from the transaction
-      const category = transaction.category;
+      let category = transaction.category || "";
+      
+      // Normalize empty or undefined categories to "Uncategorized"
+      if (!category || category.trim() === "") {
+        category = "Uncategorized";
+      }
 
       // If the category exists in the categoryCounts object, increment its count
       if (categoryCounts.hasOwnProperty(category)) {
