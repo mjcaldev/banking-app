@@ -13,7 +13,7 @@ const ibmPlexSerif = IBM_Plex_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Luno",
+  title: "Muno",
   description: "This is not a real banking application. Do not put sensitive data in here. Thanks!",
   icons: {
     icon: '/icons/logo.svg'

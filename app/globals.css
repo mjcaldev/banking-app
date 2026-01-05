@@ -104,6 +104,10 @@
     @apply text-[36px] leading-[44px];
   }
 
+  .text-48 {
+    @apply text-[48px] leading-[56px];
+  }
+
   /* Home */
   .home {
     @apply no-scrollbar flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll;
@@ -271,7 +275,11 @@
 
   /* Auth */
   .auth-asset {
-    @apply flex h-screen w-full sticky top-0 items-center justify-end bg-sky-1 max-lg:hidden;
+    @apply flex h-screen w-full sticky top-0 items-center justify-center bg-sky-1 max-lg:hidden;
+  }
+  
+  .auth-asset > div {
+    @apply w-full h-full;
   }
 
   /* Auth Form */

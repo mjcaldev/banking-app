@@ -34,6 +34,8 @@ const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState<User | null | undefined>(null);
   const [isLoading, setisLoading] = useState(false);
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
 const formSchema = authFormSchema(type);
 
@@ -57,6 +59,8 @@ const formSchema = authFormSchema(type);
     // 2. Define a submit handler.
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
       setisLoading(true);
+      setErrorMessage(null);
+      setSuccessMessage(null);
 
       try {
         // signup with App write and create plaid token
@@ -77,6 +81,7 @@ const formSchema = authFormSchema(type);
           const newUser = await signUp(userData);
 
           setUser(newUser as unknown as User);
+          setSuccessMessage('Account created successfully! Please link your bank account.');
           // PlaidLink component will handle navigation after bank linking succeeds
         }
 
@@ -86,10 +91,38 @@ const formSchema = authFormSchema(type);
             password: data.password,
           })
 
-          if(response) router.push('/')
+          if(response) {
+            setSuccessMessage('Sign in successful! Redirecting...');
+            // Small delay to show success message before redirect
+            setTimeout(() => {
+              router.push('/');
+            }, 500);
+          }
          }
-      } catch (error) {
-      console.log(error);
+      } catch (error: any) {
+        console.error('Authentication error:', error);
+        
+        // Provide user-friendly error messages without exposing sensitive details
+        // Appwrite errors typically have a message property
+        const errorMsg = error?.message || error?.toString() || 'An error occurred';
+        
+        // Map common Appwrite errors to user-friendly messages
+        if (errorMsg.includes('Invalid credentials') || 
+            errorMsg.includes('email') && errorMsg.includes('password') ||
+            errorMsg.includes('401') ||
+            errorMsg.includes('Unauthorized')) {
+          setErrorMessage('Invalid email or password. Please try again.');
+        } else if (errorMsg.includes('User already exists') || 
+                   errorMsg.includes('409')) {
+          setErrorMessage('An account with this email already exists.');
+        } else if (errorMsg.includes('network') || 
+                   errorMsg.includes('timeout') ||
+                   errorMsg.includes('ECONNREFUSED')) {
+          setErrorMessage('Network error. Please check your connection and try again.');
+        } else {
+          // Generic error message - don't expose internal error details
+          setErrorMessage('Unable to sign in. Please check your credentials and try again.');
+        }
       } finally {
       setisLoading(false);
     }
@@ -103,9 +136,9 @@ const formSchema = authFormSchema(type);
           src="/icons/logo.svg"
           width={34}
           height={34}
-          alt="Luno Logo"
+          alt="Muno Logo"
           />
-            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Luno</h1>
+            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Muno</h1>
           </Link>
           <div className="flex flex-col gap-1 md:gap-3">
             <h1 className="text-24 lg:text-36 font-semibold text-gray-900">
@@ -181,6 +214,21 @@ const formSchema = authFormSchema(type);
             label="Email" placeholder='Enter your email'/>
             <CustomInput control={form.control} name='password'
             label="Password" placeholder='Enter your password'/>
+          
+          {/* Success Message */}
+          {successMessage && (
+            <div className="p-4 rounded-lg bg-success-25 border border-success-100">
+              <p className="text-sm font-medium text-success-900">{successMessage}</p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+              <p className="text-sm font-medium text-red-900">{errorMessage}</p>
+            </div>
+          )}
+
           <div className="flex flex-col gap-4">
             <Button type="submit" disabled={isLoading} className="form-btn">
               {isLoading ? (

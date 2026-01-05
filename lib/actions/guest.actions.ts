@@ -6,7 +6,7 @@
 
 import { cookies } from 'next/headers'
 
-const GUEST_COOKIE_KEY = 'luno_guest_email'
+const GUEST_COOKIE_KEY = 'muno_guest_email'
 
 export async function setGuestCookie(email: string): Promise<void> {
   try {

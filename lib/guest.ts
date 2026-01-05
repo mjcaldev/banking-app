@@ -11,7 +11,7 @@ export interface GuestUser {
   isGuest: true;
 }
 
-const GUEST_STORAGE_KEY = 'luno_guest_user';
+const GUEST_STORAGE_KEY = 'muno_guest_user';
 
 /**
  * Check if current user is a guest
