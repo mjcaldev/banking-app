@@ -282,9 +282,25 @@
     @apply w-full h-full;
   }
 
+  /* Mobile background image */
+  .auth-asset-mobile {
+    @apply fixed inset-0 z-0;
+  }
+  
+  .auth-asset-mobile > div {
+    @apply w-full h-full;
+  }
+
   /* Auth Form */
   .auth-form {
     @apply flex min-h-screen w-full max-w-[420px] flex-col justify-center gap-5 py-10 md:gap-8;
+  }
+
+  /* Mobile auth form backdrop for readability */
+  @media (max-width: 1023px) {
+    .auth-form {
+      @apply bg-white/95 backdrop-blur-sm rounded-lg mx-4 my-4 px-6 shadow-xl;
+    }
   }
 
   .form-item {

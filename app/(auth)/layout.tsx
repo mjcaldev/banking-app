@@ -6,8 +6,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="flex min-h-screen w-full justify-between font-inter">
-      {children}
+    <main className="flex min-h-screen w-full justify-between font-inter relative">
+      {/* Background image for mobile */}
+      <div className="auth-asset-mobile lg:hidden">
+        <div className="relative w-full h-full">
+          <Image 
+            src="/icons/auth-image.jpg"
+            alt="Landscape view of golden field under blue sky"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Dark overlay for better text readability on mobile */}
+          <div className="absolute inset-0 bg-black/40"></div>
+        </div>
+      </div>
+      
+      {/* Form content with backdrop on mobile */}
+      <div className="relative z-10 w-full lg:w-auto">
+        {children}
+      </div>
+      
+      {/* Desktop side image */}
       <div className="auth-asset">
         <div className="relative w-full h-full">
           <Image 
