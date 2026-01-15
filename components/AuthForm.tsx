@@ -138,17 +138,17 @@ const formSchema = authFormSchema(type);
           height={44}
           alt="Muno Logo"
           />
-            <h1 className="text-[28px] md:text-[35px] lg:text-[39px] font-ibm-plex-serif font-bold text-black-1">Muno</h1>
+            <h1 className="text-[28px] md:text-[35px] lg:text-[34px] font-ibm-plex-serif font-bold text-black-1">Muno</h1>
           </Link>
           <div className="flex flex-col gap-1 md:gap-3">
-            <h1 className="text-[24px] md:text-[28px] lg:text-[31px] xl:text-[47px] font-semibold text-gray-900">
+            <h1 className="text-[24px] md:text-[28px] lg:text-[27px] xl:text-[41px] font-semibold text-gray-900">
               {user
               ? 'Link Account'
               : type === 'sign-in'
                 ? 'Sign In'
                 : 'Sign Up'
               }
-              <p className="text-[16px] md:text-[19px] lg:text-[21px] font-normal text-gray-600">
+              <p className="text-[16px] md:text-[19px] lg:text-[18px] font-normal text-gray-600">
                 {user
                   ? 'Link your account to get started'
                   : 'Please enter your details'
@@ -247,7 +247,7 @@ const formSchema = authFormSchema(type);
 
       <footer className="flex flex-col gap-4">
         <div className="flex justify-center gap-1">
-          <p className="text-[14px] md:text-[16px] lg:text-[18px] font-normal text-gray-600">
+          <p className="text-[14px] md:text-[16px] lg:text-[16px] font-normal text-gray-600">
             {type === 'sign-in'
             ? "Don't have an account?"
             : "Already have an account?"

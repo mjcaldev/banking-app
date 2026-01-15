@@ -45,7 +45,7 @@
 
 @layer utilities {
   .input-class {
-    @apply text-[16px] md:text-[19px] lg:text-[23px] placeholder:text-[16px] md:placeholder:text-[19px] lg:placeholder:text-[23px] rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-500 py-3 px-4 md:py-[14px] md:px-[18px] lg:py-4 lg:px-5;
+    @apply text-[16px] md:text-[19px] lg:text-[20px] placeholder:text-[16px] md:placeholder:text-[19px] lg:placeholder:text-[20px] rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-500 py-3 px-4 md:py-[14px] md:px-[18px] lg:py-[14px] lg:px-[18px];
   }
 
   .sheet-content button {
@@ -325,7 +325,7 @@
   }
 
   .form-label {
-    @apply text-[14px] md:text-[16px] lg:text-[18px] w-full max-w-[280px] font-medium text-gray-700;
+    @apply text-[14px] md:text-[16px] lg:text-[16px] w-full max-w-[280px] font-medium text-gray-700;
   }
 
   .form-message {
@@ -333,15 +333,15 @@
   }
 
   .form-btn {
-    @apply text-[16px] md:text-[19px] lg:text-[23px] rounded-lg border border-bankGradient bg-bank-gradient font-semibold text-white shadow-form py-[14px] px-6 md:py-4 md:px-7 lg:py-5 lg:px-8 w-full;
+    @apply text-[16px] md:text-[19px] lg:text-[20px] rounded-lg border border-bankGradient bg-bank-gradient font-semibold text-white shadow-form py-[14px] px-6 md:py-4 md:px-7 lg:py-[18px] lg:px-[28px] w-full;
   }
 
   .form-btn-guest {
-    @apply text-[16px] md:text-[19px] lg:text-[23px] rounded-lg border border-gray-300 font-semibold text-gray-700 shadow-form py-[14px] px-6 md:py-4 md:px-7 lg:py-5 lg:px-8 w-full;
+    @apply text-[16px] md:text-[19px] lg:text-[20px] rounded-lg border border-gray-300 font-semibold text-gray-700 shadow-form py-[14px] px-6 md:py-4 md:px-7 lg:py-[18px] lg:px-[28px] w-full;
   }
 
   .form-link {
-    @apply text-[14px] md:text-[16px] lg:text-[18px] cursor-pointer font-medium text-bankGradient;
+    @apply text-[14px] md:text-[16px] lg:text-[16px] cursor-pointer font-medium text-bankGradient;
   }
 
   /* Payment Transfer */
