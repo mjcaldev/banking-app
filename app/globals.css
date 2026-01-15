@@ -45,7 +45,7 @@
 
 @layer utilities {
   .input-class {
-    @apply text-16 placeholder:text-16 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-500;
+    @apply text-[16px] md:text-[19px] lg:text-[23px] placeholder:text-[16px] md:placeholder:text-[19px] lg:placeholder:text-[23px] rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-500 py-3 px-4 md:py-[14px] md:px-[18px] lg:py-4 lg:px-5;
   }
 
   .sheet-content button {
@@ -276,10 +276,19 @@
   /* Auth */
   .auth-asset {
     @apply flex h-screen w-full sticky top-0 items-center justify-center bg-sky-1 max-lg:hidden;
+    flex: 1 1 50%;
+    min-width: 0;
   }
   
   .auth-asset > div {
     @apply w-full h-full;
+  }
+
+  /* Form container - ensures proper width on desktop */
+  .auth-form-container {
+    @apply w-full lg:w-auto lg:flex-shrink-0;
+    flex: 0 0 50%;
+    min-width: 500px;
   }
 
   /* Mobile background image */
@@ -293,7 +302,15 @@
 
   /* Auth Form */
   .auth-form {
-    @apply flex min-h-screen w-full max-w-[420px] flex-col justify-center gap-5 py-10 md:gap-8;
+    @apply flex min-h-screen w-full max-w-[420px] flex-col justify-center gap-6 py-12 md:gap-10;
+  }
+
+  /* Desktop: Ensure form container has proper width */
+  @media (min-width: 1024px) {
+    .auth-form-container {
+      @apply flex items-center justify-center;
+      padding: 0 2rem;
+    }
   }
 
   /* Mobile auth form backdrop for readability */
@@ -308,7 +325,7 @@
   }
 
   .form-label {
-    @apply text-14 w-full max-w-[280px] font-medium text-gray-700;
+    @apply text-[14px] md:text-[16px] lg:text-[18px] w-full max-w-[280px] font-medium text-gray-700;
   }
 
   .form-message {
@@ -316,11 +333,15 @@
   }
 
   .form-btn {
-    @apply text-16 rounded-lg border border-bankGradient bg-bank-gradient font-semibold text-white shadow-form;
+    @apply text-[16px] md:text-[19px] lg:text-[23px] rounded-lg border border-bankGradient bg-bank-gradient font-semibold text-white shadow-form py-[14px] px-6 md:py-4 md:px-7 lg:py-5 lg:px-8 w-full;
+  }
+
+  .form-btn-guest {
+    @apply text-[16px] md:text-[19px] lg:text-[23px] rounded-lg border border-gray-300 font-semibold text-gray-700 shadow-form py-[14px] px-6 md:py-4 md:px-7 lg:py-5 lg:px-8 w-full;
   }
 
   .form-link {
-    @apply text-14 cursor-pointer font-medium text-bankGradient;
+    @apply text-[14px] md:text-[16px] lg:text-[18px] cursor-pointer font-medium text-bankGradient;
   }
 
   /* Payment Transfer */

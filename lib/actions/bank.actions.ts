@@ -273,16 +273,16 @@ export const getTransactions = async ({
         }
 
         return {
-          id: transaction.transaction_id,
-          name: transaction.name,
-          paymentChannel: transaction.payment_channel,
-          type: transaction.payment_channel,
-          accountId: transaction.account_id,
-          amount: transaction.amount,
-          pending: transaction.pending,
+        id: transaction.transaction_id,
+        name: transaction.name,
+        paymentChannel: transaction.payment_channel,
+        type: transaction.payment_channel,
+        accountId: transaction.account_id,
+        amount: transaction.amount,
+        pending: transaction.pending,
           category: category,
-          date: transaction.date,
-          image: transaction.logo_url,
+        date: transaction.date,
+        image: transaction.logo_url,
         };
       });
 

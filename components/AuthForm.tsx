@@ -134,21 +134,21 @@ const formSchema = authFormSchema(type);
       <Link href="/" className="cursor-pointer flex items-center gap-1">
           <Image 
           src="/icons/logo.svg"
-          width={34}
-          height={34}
+          width={44}
+          height={44}
           alt="Muno Logo"
           />
-            <h1 className="text-30 font-ibm-plex-serif font-bold text-black-1">Muno</h1>
+            <h1 className="text-[28px] md:text-[35px] lg:text-[39px] font-ibm-plex-serif font-bold text-black-1">Muno</h1>
           </Link>
           <div className="flex flex-col gap-1 md:gap-3">
-            <h1 className="text-24 lg:text-36 font-semibold text-gray-900">
+            <h1 className="text-[24px] md:text-[28px] lg:text-[31px] xl:text-[47px] font-semibold text-gray-900">
               {user
               ? 'Link Account'
               : type === 'sign-in'
                 ? 'Sign In'
                 : 'Sign Up'
               }
-              <p className="text-16 font-normal text-gray-600">
+              <p className="text-[16px] md:text-[19px] lg:text-[21px] font-normal text-gray-600">
                 {user
                   ? 'Link your account to get started'
                   : 'Please enter your details'
@@ -247,7 +247,7 @@ const formSchema = authFormSchema(type);
 
       <footer className="flex flex-col gap-4">
         <div className="flex justify-center gap-1">
-          <p className="text-14 font-normal text-gray-600">
+          <p className="text-[14px] md:text-[16px] lg:text-[18px] font-normal text-gray-600">
             {type === 'sign-in'
             ? "Don't have an account?"
             : "Already have an account?"
@@ -269,7 +269,7 @@ const formSchema = authFormSchema(type);
               type="button"
               variant="outline"
               onClick={() => setShowGuestPrompt(true)}
-              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="form-btn-guest w-full border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Continue as Guest
             </Button>

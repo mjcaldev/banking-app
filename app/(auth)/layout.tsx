@@ -6,7 +6,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="flex min-h-screen w-full justify-between font-inter relative">
+    <main className="flex min-h-screen w-full font-inter relative">
       {/* Background image for mobile */}
       <div className="auth-asset-mobile lg:hidden">
         <div className="relative w-full h-full">
@@ -23,7 +23,7 @@ export default function RootLayout({
       </div>
       
       {/* Form content with backdrop on mobile */}
-      <div className="relative z-10 w-full lg:w-auto">
+      <div className="auth-form-container relative z-10">
         {children}
       </div>
       
