@@ -3,7 +3,7 @@ import React from 'react'
 
 const SignIn = () => {
   return (
-    <section className="flex-center size-full max-sm:px-6">
+    <section className="flex-center w-full overflow-x-hidden">
       <AuthForm type="sign-in"/>
     </section>
   )
